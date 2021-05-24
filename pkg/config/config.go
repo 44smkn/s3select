@@ -24,10 +24,10 @@ type FlagConfig struct {
 
 // BindFlags コマンドライン引数を構造体にバインドします
 func (cfg *FlagConfig) BindFlags(fs *pflag.FlagSet) {
-	fs.StringVar(&cfg.BucketName, flagBucketName, "", "Set the log level - info(default), debug")
-	fs.StringVar(&cfg.KeyPrefix, flagKeyPrefix, defaultKeyPrefix, "Whether or not to use a proxy when accessing kibana")
-	fs.StringVar(&cfg.Format, flagFormat, defaultFormat, "Set the slack token")
-	fs.StringVar(&cfg.SQL, flagSQL, "", "Set the recipient of slack - e.g. #pj_sre")
+	fs.StringVar(&cfg.BucketName, flagBucketName, "", "The bucket name containing the object")
+	fs.StringVar(&cfg.KeyPrefix, flagKeyPrefix, defaultKeyPrefix, "Key of the object to SELECT")
+	fs.StringVar(&cfg.Format, flagFormat, defaultFormat, "Describes the format of the data in the object that is being queried")
+	fs.StringVar(&cfg.SQL, flagSQL, "", "The expression that is used to query the object")
 }
 
 // Validate は設定内容に不備がないかを確認します
