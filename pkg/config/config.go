@@ -1,9 +1,8 @@
 package config
 
 import (
-	"errors"
-
 	"github.com/spf13/pflag"
+	"golang.org/x/xerrors"
 )
 
 const (
@@ -33,10 +32,10 @@ func (cfg *FlagConfig) BindFlags(fs *pflag.FlagSet) {
 // Validate は設定内容に不備がないかを確認します
 func (cfg *FlagConfig) Validate() error {
 	if len(cfg.BucketName) == 0 {
-		return errors.New("bucket name must be specified")
+		return xerrors.New("bucket name must be specified")
 	}
 	if len(cfg.SQL) == 0 {
-		return errors.New("sql must be specified")
+		return xerrors.New("sql must be specified")
 	}
 	return nil
 }
