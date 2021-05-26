@@ -7,6 +7,7 @@ import (
 
 	"github.com/44smkn/s3selecgo/pkg/aws"
 	"github.com/44smkn/s3selecgo/pkg/config"
+	"github.com/44smkn/s3selecgo/pkg/log"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
@@ -22,6 +23,7 @@ const (
 	ExitCodeParseFlagsError
 	ExitCodeLoggerError
 	ExitCodeCloudError
+	ExitCodeObjectListingError
 )
 
 func main() {
@@ -34,7 +36,7 @@ func run(args []string) int {
 		fmt.Fprintf(os.Stderr, "コマンド引数のパースに失敗しました\n%v\n", err)
 		return ExitCodeParseFlagsError
 	}
-	logger, err := zap.NewDevelopment()
+	logger, err := log.NewLogger(cfg.LogLevel)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "ロガーの生成に失敗しました\n%v\n", err)
 		return ExitCodeLoggerError
@@ -53,7 +55,8 @@ func run(args []string) int {
 	}
 	objects, err := cloud.S3().ListObjectsV2AsList(ctx, &req)
 	if err != nil {
-		logger.Fatal("object listing is failed", zap.String("error", err.Error()))
+		logger.Sugar().Errorf("object listing is failed: %s", err.Error())
+		return ExitCodeObjectListingError
 	}
 
 	for _, o := range objects {
