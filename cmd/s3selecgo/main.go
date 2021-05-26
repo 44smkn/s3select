@@ -50,8 +50,8 @@ func run(args []string) int {
 	ctx := context.Background()
 
 	req := s3sdk.ListObjectsV2Input{
-		Bucket: awssdk.String(cfg.S3Config.BucketName),
-		Prefix: awssdk.String(cfg.S3Config.KeyPrefix),
+		Bucket: awssdk.String(cfg.S3SelectConfig.BucketName),
+		Prefix: awssdk.String(cfg.S3SelectConfig.KeyPrefix),
 	}
 	objects, err := cloud.S3().ListObjectsV2AsList(ctx, &req)
 	if err != nil {
@@ -61,10 +61,10 @@ func run(args []string) int {
 
 	for _, o := range objects {
 		params := &s3sdk.SelectObjectContentInput{
-			Bucket:          awssdk.String(cfg.S3Config.BucketName),
+			Bucket:          awssdk.String(cfg.S3SelectConfig.BucketName),
 			Key:             o.Key,
 			ExpressionType:  awssdk.String(s3.ExpressionTypeSql),
-			Expression:      awssdk.String(cfg.S3Config.SQL),
+			Expression:      awssdk.String(cfg.S3SelectConfig.SQL),
 			RequestProgress: &s3.RequestProgress{},
 			InputSerialization: &s3.InputSerialization{
 				CompressionType: awssdk.String("GZIP"),
@@ -104,7 +104,7 @@ func loadConfig(args []string) (config.CliConfig, error) {
 	if err := fs.Parse(os.Args); err != nil {
 		return config.CliConfig{}, err
 	}
-	if err := cfg.S3Config.Validate(); err != nil {
+	if err := cfg.S3SelectConfig.Validate(); err != nil {
 		return config.CliConfig{}, err
 	}
 

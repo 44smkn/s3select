@@ -11,14 +11,14 @@ const (
 )
 
 type CliConfig struct {
-	LogLevel  string
-	S3Config  S3Config
-	AWSConfig aws.CloudConfig
+	LogLevel       string
+	S3SelectConfig S3SelectConfig
+	AWSConfig      aws.CloudConfig
 }
 
 // BindFlags binds the command line flags to the fields in the config object
 func (cfg *CliConfig) BindFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&cfg.LogLevel, flagLogLevel, defaultLogLevel, "Set the cli log level - info(default), debug")
-	cfg.S3Config.BindFlags(fs)
+	cfg.S3SelectConfig.BindFlags(fs)
 	cfg.AWSConfig.BindFlags(fs)
 }

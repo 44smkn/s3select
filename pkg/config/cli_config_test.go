@@ -18,7 +18,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "normal case",
 			cfg: config.CliConfig{
-				S3Config: config.S3Config{
+				S3SelectConfig: config.S3SelectConfig{
 					BucketName: "foo",
 					KeyPrefix:  "bar",
 					Format:     "CSV",
@@ -30,7 +30,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "bucket name is not specified",
 			cfg: config.CliConfig{
-				S3Config: config.S3Config{
+				S3SelectConfig: config.S3SelectConfig{
 					BucketName: "",
 					KeyPrefix:  "hoge",
 					Format:     "CSV",
@@ -42,7 +42,7 @@ func TestValidate(t *testing.T) {
 		{
 			name: "sql expression is not specified",
 			cfg: config.CliConfig{
-				S3Config: config.S3Config{
+				S3SelectConfig: config.S3SelectConfig{
 					BucketName: "foo",
 					KeyPrefix:  "bar",
 					Format:     "CSV",
@@ -57,7 +57,7 @@ func TestValidate(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			err := tt.cfg.S3Config.Validate()
+			err := tt.cfg.S3SelectConfig.Validate()
 			if tt.wantErr != nil {
 				assert.EqualError(t, err, tt.wantErr.Error())
 			} else {
