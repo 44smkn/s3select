@@ -1,13 +1,15 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
+	"github.com/44smkn/s3selecgo/pkg/aws"
 	"github.com/44smkn/s3selecgo/pkg/config"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
+	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	s3sdk "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/spf13/pflag"
 	"go.uber.org/zap"
 )
@@ -19,6 +21,7 @@ const (
 	ExitCodeError = 10 + iota
 	ExitCodeParseFlagsError
 	ExitCodeLoggerError
+	ExitCodeCloudError
 )
 
 func main() {
@@ -37,38 +40,43 @@ func run(args []string) int {
 		return ExitCodeLoggerError
 	}
 
-	sess := session.Must(session.NewSession(aws.NewConfig().WithRegion("ap-northeast-1")))
-	svc := s3.New(sess)
-
-	params := &s3.ListObjectsInput{
-		Bucket: aws.String(cfg.BucketName),
-		Prefix: aws.String(cfg.KeyPrefix),
+	cloud, err := aws.NewCloud(cfg.AWSConfig)
+	if err != nil {
+		return ExitCodeCloudError
 	}
-	resp, err := svc.ListObjects(params)
+
+	ctx := context.Background()
+
+	req := s3sdk.ListObjectsV2Input{
+		Bucket: awssdk.String(cfg.S3Config.BucketName),
+		Prefix: awssdk.String(cfg.S3Config.KeyPrefix),
+	}
+	objects, err := cloud.S3().ListObjectsV2AsList(ctx, &req)
 	if err != nil {
 		logger.Fatal("object listing is failed", zap.String("error", err.Error()))
 	}
-	for _, item := range resp.Contents {
-		params := &s3.SelectObjectContentInput{
-			Bucket:          aws.String(cfg.BucketName),
-			Key:             item.Key,
-			ExpressionType:  aws.String(s3.ExpressionTypeSql),
-			Expression:      aws.String(cfg.SQL),
+
+	for _, o := range objects {
+		params := &s3sdk.SelectObjectContentInput{
+			Bucket:          awssdk.String(cfg.S3Config.BucketName),
+			Key:             o.Key,
+			ExpressionType:  awssdk.String(s3.ExpressionTypeSql),
+			Expression:      awssdk.String(cfg.S3Config.SQL),
 			RequestProgress: &s3.RequestProgress{},
 			InputSerialization: &s3.InputSerialization{
-				CompressionType: aws.String("GZIP"),
+				CompressionType: awssdk.String("GZIP"),
 				CSV: &s3.CSVInput{
-					FileHeaderInfo: aws.String(s3.FileHeaderInfoNone),
-					FieldDelimiter: aws.String(" "),
+					FileHeaderInfo: awssdk.String(s3.FileHeaderInfoNone),
+					FieldDelimiter: awssdk.String(" "),
 				},
 			},
 			OutputSerialization: &s3.OutputSerialization{
 				CSV: &s3.CSVOutput{
-					FieldDelimiter: aws.String(" "),
+					FieldDelimiter: awssdk.String(" "),
 				},
 			},
 		}
-		resp, err := svc.SelectObjectContent(params)
+		resp, err := cloud.S3().SelectObjectContent(params)
 		if err != nil {
 			logger.Error("s3 select is failed", zap.String("error", err.Error()))
 		}
@@ -85,16 +93,16 @@ func run(args []string) int {
 	return ExitCodeOK
 }
 
-func loadConfig(args []string) (config.FlagConfig, error) {
-	cfg := config.FlagConfig{}
+func loadConfig(args []string) (config.CliConfig, error) {
+	cfg := config.CliConfig{}
 	fs := pflag.NewFlagSet("command line args", pflag.ExitOnError)
 	cfg.BindFlags(fs)
 
 	if err := fs.Parse(os.Args); err != nil {
-		return config.FlagConfig{}, err
+		return config.CliConfig{}, err
 	}
-	if err := cfg.Validate(); err != nil {
-		return config.FlagConfig{}, err
+	if err := cfg.S3Config.Validate(); err != nil {
+		return config.CliConfig{}, err
 	}
 
 	return cfg, nil

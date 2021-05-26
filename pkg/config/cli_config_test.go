@@ -12,36 +12,42 @@ func TestValidate(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		name    string
-		cfg     config.FlagConfig
+		cfg     config.CliConfig
 		wantErr error
 	}{
 		{
 			name: "normal case",
-			cfg: config.FlagConfig{
-				BucketName: "foo",
-				KeyPrefix:  "bar",
-				Format:     "CSV",
-				SQL:        "select * from s3object limit 100",
+			cfg: config.CliConfig{
+				S3Config: config.S3Config{
+					BucketName: "foo",
+					KeyPrefix:  "bar",
+					Format:     "CSV",
+					SQL:        "select * from s3object limit 100",
+				},
 			},
 			wantErr: nil,
 		},
 		{
 			name: "bucket name is not specified",
-			cfg: config.FlagConfig{
-				BucketName: "",
-				KeyPrefix:  "hoge",
-				Format:     "CSV",
-				SQL:        "select * from s3object limit 100",
+			cfg: config.CliConfig{
+				S3Config: config.S3Config{
+					BucketName: "",
+					KeyPrefix:  "hoge",
+					Format:     "CSV",
+					SQL:        "select * from s3object limit 100",
+				},
 			},
 			wantErr: xerrors.New("bucket name must be specified"),
 		},
 		{
 			name: "sql expression is not specified",
-			cfg: config.FlagConfig{
-				BucketName: "foo",
-				KeyPrefix:  "bar",
-				Format:     "CSV",
-				SQL:        "",
+			cfg: config.CliConfig{
+				S3Config: config.S3Config{
+					BucketName: "foo",
+					KeyPrefix:  "bar",
+					Format:     "CSV",
+					SQL:        "",
+				},
 			},
 			wantErr: xerrors.New("sql must be specified"),
 		},
@@ -51,7 +57,7 @@ func TestValidate(t *testing.T) {
 		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
-			err := tt.cfg.Validate()
+			err := tt.cfg.S3Config.Validate()
 			if tt.wantErr != nil {
 				assert.EqualError(t, err, tt.wantErr.Error())
 			} else {

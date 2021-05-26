@@ -14,7 +14,7 @@ const (
 	defaultFormat    = "CSV"
 )
 
-type FlagConfig struct {
+type S3Config struct {
 	BucketName string
 	KeyPrefix  string
 	Format     string
@@ -22,7 +22,7 @@ type FlagConfig struct {
 }
 
 // BindFlags コマンドライン引数を構造体にバインドします
-func (cfg *FlagConfig) BindFlags(fs *pflag.FlagSet) {
+func (cfg *S3Config) BindFlags(fs *pflag.FlagSet) {
 	fs.StringVar(&cfg.BucketName, flagBucketName, "", "The bucket name containing the object")
 	fs.StringVar(&cfg.KeyPrefix, flagKeyPrefix, defaultKeyPrefix, "Key of the object to SELECT")
 	fs.StringVar(&cfg.Format, flagFormat, defaultFormat, "Describes the format of the data in the object that is being queried")
@@ -30,7 +30,7 @@ func (cfg *FlagConfig) BindFlags(fs *pflag.FlagSet) {
 }
 
 // Validate は設定内容に不備がないかを確認します
-func (cfg *FlagConfig) Validate() error {
+func (cfg *S3Config) Validate() error {
 	if len(cfg.BucketName) == 0 {
 		return xerrors.New("bucket name must be specified")
 	}
