@@ -33,12 +33,12 @@ func main() {
 func run(args []string) int {
 	cfg, err := loadConfig(args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "コマンド引数のパースに失敗しました\n%v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to parse command args:\n%v\n", err)
 		return ExitCodeParseFlagsError
 	}
 	logger, err := log.NewLogger(cfg.LogLevel)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "ロガーの生成に失敗しました\n%v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to create logger instance: \n%v\n", err)
 		return ExitCodeLoggerError
 	}
 
@@ -55,7 +55,7 @@ func run(args []string) int {
 	}
 	objects, err := cloud.S3().ListObjectsV2AsList(ctx, &req)
 	if err != nil {
-		logger.Sugar().Errorf("object listing is failed: %s", err.Error())
+		logger.Sugar().Errorf("failed to execute s3listobeject api: %s", err.Error())
 		return ExitCodeObjectListingError
 	}
 
@@ -81,12 +81,12 @@ func run(args []string) int {
 		}
 		resp, err := cloud.S3().SelectObjectContent(params)
 		if err != nil {
-			logger.Error("s3 select is failed", zap.String("error", err.Error()))
+			logger.Error("failed to execute s3select api", zap.String("error", err.Error()))
 		}
 		defer resp.EventStream.Close()
 
 		for event := range resp.EventStream.Events() {
-			// メッセージタイプ（イベントのタイプ）が ``Records`` の場合にメッセージからデータを取り出す
+			// If the event type is `records`, it fetch the data from the message.
 			v, ok := event.(*s3.RecordsEvent)
 			if ok {
 				fmt.Println(string(v.Payload))
