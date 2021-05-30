@@ -19,10 +19,10 @@ func TestValidate(t *testing.T) {
 			name: "normal case",
 			cfg: config.CliConfig{
 				S3SelectConfig: config.S3SelectConfig{
-					BucketName:    "foo",
-					KeyPrefix:     "bar",
-					Format:        "CSV",
-					SQLExpression: "select * from s3object limit 100",
+					BucketName: "foo",
+					KeyPrefix:  "bar",
+					Format:     "CSV",
+					Expression: "select * from s3object limit 100",
 				},
 			},
 			wantErr: nil,
@@ -31,10 +31,10 @@ func TestValidate(t *testing.T) {
 			name: "bucket name is not specified",
 			cfg: config.CliConfig{
 				S3SelectConfig: config.S3SelectConfig{
-					BucketName:    "",
-					KeyPrefix:     "hoge",
-					Format:        "CSV",
-					SQLExpression: "select * from s3object limit 100",
+					BucketName: "",
+					KeyPrefix:  "hoge",
+					Format:     "CSV",
+					Expression: "select * from s3object limit 100",
 				},
 			},
 			wantErr: xerrors.New("bucket name must be specified"),
@@ -43,10 +43,10 @@ func TestValidate(t *testing.T) {
 			name: "sql expression is not specified",
 			cfg: config.CliConfig{
 				S3SelectConfig: config.S3SelectConfig{
-					BucketName:    "foo",
-					KeyPrefix:     "bar",
-					Format:        "CSV",
-					SQLExpression: "",
+					BucketName: "foo",
+					KeyPrefix:  "bar",
+					Format:     "CSV",
+					Expression: "",
 				},
 			},
 			wantErr: xerrors.New("sql must be specified"),

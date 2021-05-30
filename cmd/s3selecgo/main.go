@@ -9,10 +9,8 @@ import (
 	"github.com/44smkn/s3selecgo/pkg/config"
 	"github.com/44smkn/s3selecgo/pkg/log"
 	awssdk "github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/s3"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/spf13/pflag"
-	"go.uber.org/zap"
 )
 
 const (
@@ -59,39 +57,12 @@ func run(args []string) int {
 		return ExitCodeObjectListingError
 	}
 
+	query, err := NewS3SelectQuery(cfg.S3SelectConfig, cloud)
+	if err != nil {
+		logger.Sugar().Errorf("failed to create s3select query: %v", err.Error())
+	}
 	for _, o := range objects {
-		params := &s3sdk.SelectObjectContentInput{
-			Bucket:          awssdk.String(cfg.S3SelectConfig.BucketName),
-			Key:             o.Key,
-			ExpressionType:  awssdk.String(s3.ExpressionTypeSql),
-			Expression:      awssdk.String(cfg.S3SelectConfig.SQLExpression),
-			RequestProgress: &s3.RequestProgress{},
-			InputSerialization: &s3.InputSerialization{
-				CompressionType: awssdk.String(cfg.S3SelectConfig.InputCompressionType),
-				CSV: &s3.CSVInput{
-					FileHeaderInfo: awssdk.String(s3.FileHeaderInfoNone),
-					FieldDelimiter: awssdk.String(" "),
-				},
-			},
-			OutputSerialization: &s3.OutputSerialization{
-				CSV: &s3.CSVOutput{
-					FieldDelimiter: awssdk.String(" "),
-				},
-			},
-		}
-		resp, err := cloud.S3().SelectObjectContent(params)
-		if err != nil {
-			logger.Error("failed to execute s3select api", zap.String("error", err.Error()))
-		}
-		defer resp.EventStream.Close()
-
-		for event := range resp.EventStream.Events() {
-			// If the event type is `records`, it fetch the data from the message.
-			v, ok := event.(*s3.RecordsEvent)
-			if ok {
-				fmt.Println(string(v.Payload))
-			}
-		}
+		query.Do(ctx, cfg.S3SelectConfig.BucketName, *o.Key, os.Stdout)
 	}
 	return ExitCodeOK
 }
