@@ -67,7 +67,7 @@ func run(args []string) int {
 			Expression:      awssdk.String(cfg.S3SelectConfig.SQL),
 			RequestProgress: &s3.RequestProgress{},
 			InputSerialization: &s3.InputSerialization{
-				CompressionType: awssdk.String("GZIP"),
+				CompressionType: awssdk.String(cfg.S3SelectConfig.InputCompressionType),
 				CSV: &s3.CSVInput{
 					FileHeaderInfo: awssdk.String(s3.FileHeaderInfoNone),
 					FieldDelimiter: awssdk.String(" "),
