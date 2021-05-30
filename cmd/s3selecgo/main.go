@@ -64,7 +64,7 @@ func run(args []string) int {
 			Bucket:          awssdk.String(cfg.S3SelectConfig.BucketName),
 			Key:             o.Key,
 			ExpressionType:  awssdk.String(s3.ExpressionTypeSql),
-			Expression:      awssdk.String(cfg.S3SelectConfig.SQL),
+			Expression:      awssdk.String(cfg.S3SelectConfig.SQLExpression),
 			RequestProgress: &s3.RequestProgress{},
 			InputSerialization: &s3.InputSerialization{
 				CompressionType: awssdk.String(cfg.S3SelectConfig.InputCompressionType),
