@@ -1,4 +1,4 @@
-package main
+package query
 
 import (
 	"context"
@@ -14,11 +14,38 @@ import (
 	"golang.org/x/xerrors"
 )
 
-type S3SelectQuery interface {
-	Do(ctx context.Context, bucketName, objectKey string, writer io.Writer)
+type StorageQueryer interface {
+	Query(ctx context.Context, bucketName, objectKey string, writer io.Writer)
 }
 
-type S3SelectSQLQuery struct {
+func NewQueryer(cfg config.S3SelectConfig, cloud aws.Cloud) (StorageQueryer, error) {
+	switch et := strings.ToLower(cfg.ExpressionType); et {
+	case "sql":
+		return NewDefaultStorageQueryer(cfg, cloud), nil
+	default:
+		return nil, xerrors.New("Expression type you chose does not match. you must choose from 'SQL'")
+	}
+}
+
+func NewDefaultStorageQueryer(cfg config.S3SelectConfig, cloud aws.Cloud) defaultStorageQueryer {
+	csvInput := csvInputSerialization{
+		fileHeaderInfo:   cfg.InputFileHeaderInfo,
+		fieldDelimiter:   cfg.InputFieldDelimiter,
+		compresssionType: cfg.InputCompressionType,
+	}
+	csvOutput := csvOutputSerialization{
+		recordDelimiter: getOrDefault(cfg.OutputRecordDelimiter, cfg.InputFieldDelimiter),
+	}
+	return defaultStorageQueryer{
+		cloud:     cloud,
+		csvInput:  csvInput,
+		csvOutput: csvOutput,
+	}
+}
+
+var _ StorageQueryer = &defaultStorageQueryer{}
+
+type defaultStorageQueryer struct {
 	cloud      aws.Cloud
 	logger     zap.Logger
 	expression string
@@ -36,31 +63,6 @@ type csvOutputSerialization struct {
 	recordDelimiter string
 }
 
-func NewS3SelectQuery(cfg config.S3SelectConfig, cloud aws.Cloud) (S3SelectQuery, error) {
-	switch et := strings.ToLower(cfg.ExpressionType); et {
-	case "sql":
-		return newS3SelectSQLQuery(cfg, cloud), nil
-	default:
-		return nil, xerrors.New("Expression type you chose does not match. you must choose from 'SQL'")
-	}
-}
-
-func newS3SelectSQLQuery(cfg config.S3SelectConfig, cloud aws.Cloud) S3SelectSQLQuery {
-	csvInput := csvInputSerialization{
-		fileHeaderInfo:   cfg.InputFileHeaderInfo,
-		fieldDelimiter:   cfg.InputFieldDelimiter,
-		compresssionType: cfg.InputCompressionType,
-	}
-	csvOutput := csvOutputSerialization{
-		recordDelimiter: getOrDefault(cfg.OutputRecordDelimiter, cfg.InputFieldDelimiter),
-	}
-	return S3SelectSQLQuery{
-		cloud:     cloud,
-		csvInput:  csvInput,
-		csvOutput: csvOutput,
-	}
-}
-
 func getOrDefault(val, defaultVal string) string {
 	if val != "" {
 		return val
@@ -68,7 +70,7 @@ func getOrDefault(val, defaultVal string) string {
 	return defaultVal
 }
 
-func (s S3SelectSQLQuery) Do(ctx context.Context, bucketName, objectKey string, writer io.Writer) {
+func (s defaultStorageQueryer) Query(ctx context.Context, bucketName, objectKey string, writer io.Writer) {
 	input := &s3sdk.SelectObjectContentInput{
 		Bucket:          awssdk.String(bucketName),
 		Key:             awssdk.String(objectKey),

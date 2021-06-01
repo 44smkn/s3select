@@ -8,6 +8,7 @@ import (
 	"github.com/44smkn/s3selecgo/pkg/aws"
 	"github.com/44smkn/s3selecgo/pkg/config"
 	"github.com/44smkn/s3selecgo/pkg/log"
+	"github.com/44smkn/s3selecgo/pkg/query"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/spf13/pflag"
@@ -57,12 +58,9 @@ func run(args []string) int {
 		return ExitCodeObjectListingError
 	}
 
-	query, err := NewS3SelectQuery(cfg.S3SelectConfig, cloud)
-	if err != nil {
-		logger.Sugar().Errorf("failed to create s3select query: %v", err.Error())
-	}
+	sq := query.NewDefaultStorageQueryer(cfg.S3SelectConfig, cloud)
 	for _, o := range objects {
-		query.Do(ctx, cfg.S3SelectConfig.BucketName, *o.Key, os.Stdout)
+		sq.Query(ctx, cfg.S3SelectConfig.BucketName, *o.Key, os.Stdout)
 	}
 	return ExitCodeOK
 }
