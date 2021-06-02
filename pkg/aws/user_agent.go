@@ -3,7 +3,7 @@ package aws
 import (
 	"fmt"
 
-	"github.com/44smkn/s3selecgo/pkg/version"
+	"github.com/44smkn/s3selecgo/pkg/build"
 
 	"github.com/aws/aws-sdk-go/aws/request"
 )
@@ -14,6 +14,6 @@ const appName = "s3selecgo"
 func injectUserAgent(handlers *request.Handlers) {
 	handlers.Build.PushFrontNamed(request.NamedHandler{
 		Name: fmt.Sprintf("%s/user-agent", appName),
-		Fn:   request.MakeAddToUserAgentHandler(appName, version.GitVersion),
+		Fn:   request.MakeAddToUserAgentHandler(appName, build.Version),
 	})
 }
