@@ -39,7 +39,7 @@ func configureRun(opts *ConfigureOptions) error {
 		}
 	}
 
-	s3selectCfgFile := filepath.Join(s3selectDir, "config.yaml")
+	s3selectCfgFile := filepath.Join(s3selectDir, "config")
 	if _, err := os.Stat(s3selectCfgFile); os.IsNotExist(err) {
 		if err := os.WriteFile(s3selectCfgFile, []byte(""), 0600); err != nil {
 			return xerrors.Errorf("failed to make config file '%s': %w", s3selectDir, err)
