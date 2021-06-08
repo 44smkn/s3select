@@ -1,4 +1,4 @@
-module github.com/44smkn/s3selecgo
+module github.com/44smkn/s3select
 
 go 1.16
 

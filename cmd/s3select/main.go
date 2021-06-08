@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/44smkn/s3selecgo/pkg/build"
-	"github.com/44smkn/s3selecgo/pkg/cli/root"
+	"github.com/44smkn/s3select/pkg/build"
+	"github.com/44smkn/s3select/pkg/cli/root"
 )
 
 const (

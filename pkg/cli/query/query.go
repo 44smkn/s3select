@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/44smkn/s3selecgo/pkg/aws"
-	"github.com/44smkn/s3selecgo/pkg/config"
-	"github.com/44smkn/s3selecgo/pkg/query"
+	"github.com/44smkn/s3select/pkg/aws"
+	"github.com/44smkn/s3select/pkg/config"
+	"github.com/44smkn/s3select/pkg/query"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/spf13/cobra"

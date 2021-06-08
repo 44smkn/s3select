@@ -3,7 +3,7 @@ package config_test
 import (
 	"testing"
 
-	"github.com/44smkn/s3selecgo/pkg/config"
+	"github.com/44smkn/s3select/pkg/config"
 	"github.com/stretchr/testify/assert"
 	"golang.org/x/xerrors"
 )

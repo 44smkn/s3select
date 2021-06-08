@@ -5,8 +5,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/44smkn/s3selecgo/pkg/aws"
-	"github.com/44smkn/s3selecgo/pkg/config"
+	"github.com/44smkn/s3select/pkg/aws"
+	"github.com/44smkn/s3select/pkg/config"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"

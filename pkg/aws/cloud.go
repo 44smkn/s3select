@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/44smkn/s3selecgo/pkg/aws/services"
+	"github.com/44smkn/s3select/pkg/aws/services"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 )

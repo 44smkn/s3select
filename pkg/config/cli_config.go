@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/44smkn/s3selecgo/pkg/aws"
+	"github.com/44smkn/s3select/pkg/aws"
 	"github.com/spf13/pflag"
 )
 

@@ -4,4 +4,4 @@ build:
 		-X ${VERSION_PKG}.GitVersion=${GIT_VERSION} \
 		-X ${VERSION_PKG}.GitCommit=${GIT_COMMIT} \
 		-X ${VERSION_PKG}.BuildDate=${BUILD_DATE}" \
-		-buildmode=pie -a cmd/s3selecgo/main.go
+		-buildmode=pie -a cmd/s3select/main.go

@@ -3,9 +3,9 @@ package root
 import (
 	"os"
 
-	configureCmd "github.com/44smkn/s3selecgo/pkg/cli/configure"
-	queryCmd "github.com/44smkn/s3selecgo/pkg/cli/query"
-	versionCmd "github.com/44smkn/s3selecgo/pkg/cli/version"
+	configureCmd "github.com/44smkn/s3select/pkg/cli/configure"
+	queryCmd "github.com/44smkn/s3select/pkg/cli/query"
+	versionCmd "github.com/44smkn/s3select/pkg/cli/version"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"

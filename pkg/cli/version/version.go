@@ -28,5 +28,5 @@ func Format(version, buildDate string) string {
 		dateStr = fmt.Sprintf(" (%s)", buildDate)
 	}
 
-	return fmt.Sprintf("s3selecgo version %s%s\n", version, dateStr)
+	return fmt.Sprintf("s3select version %s%s\n", version, dateStr)
 }
