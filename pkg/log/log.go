@@ -9,7 +9,7 @@ import (
 )
 
 // NewLogger creates a new zap logger with the specified log level
-func NewLogger(level string) (*zap.Logger, error) {
+func New(level string) (*zap.Logger, error) {
 	l, err := logLevel(level)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse log level")

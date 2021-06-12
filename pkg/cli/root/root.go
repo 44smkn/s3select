@@ -1,17 +1,16 @@
 package root
 
 import (
-	"os"
-
 	configureCmd "github.com/44smkn/s3select/pkg/cli/configure"
 	queryCmd "github.com/44smkn/s3select/pkg/cli/query"
 	versionCmd "github.com/44smkn/s3select/pkg/cli/version"
+	"github.com/44smkn/s3select/pkg/cliutil"
 
 	"github.com/MakeNowJust/heredoc"
 	"github.com/spf13/cobra"
 )
 
-func NewCmdRoot(version, buildDate string) *cobra.Command {
+func NewCmdRoot(f *cliutil.Factory, version, buildDate string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "s3select <command> [flags]",
 		Short: "S3Select CLI implemented with golang",
@@ -25,12 +24,12 @@ func NewCmdRoot(version, buildDate string) *cobra.Command {
 		`),
 	}
 
-	cmd.SetOut(os.Stdout)
-	cmd.SetErr(os.Stderr)
+	cmd.SetOut(f.Out)
+	cmd.SetErr(f.ErrOut)
 
 	cmd.AddCommand(versionCmd.NewCmdVersion(version, buildDate))
 	cmd.AddCommand(configureCmd.NewCmdCongigure())
-	cmd.AddCommand(queryCmd.NewCmdQuery())
+	cmd.AddCommand(queryCmd.NewCmdQuery(f))
 
 	cmd.PersistentFlags().Bool("help", false, "Show help for command")
 

@@ -4,9 +4,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/44smkn/s3select/pkg/aws"
 	"github.com/44smkn/s3select/pkg/config"
 	"github.com/mattn/go-colorable"
+	"go.uber.org/zap"
 )
 
 type Factory struct {
@@ -14,13 +14,12 @@ type Factory struct {
 	Out    io.Writer
 	ErrOut io.Writer
 
-	AwsClient func() (aws.Cloud, error)
-	Config    config.Config
-
+	Config     func() (config.Config, error)
+	Logger     *zap.Logger
 	Executable string
 }
 
-func NewFactory(appVersion string) (*Factory, error) {
+func NewFactory(appVersion string, logger *zap.Logger) (*Factory, error) {
 	var cachedCfg config.Config
 	var cfgErr error
 	cfgFunc := func() (config.Config, error) {
@@ -41,16 +40,8 @@ func NewFactory(appVersion string) (*Factory, error) {
 		Out:    colorable.NewColorable(os.Stdout),
 		ErrOut: colorable.NewColorable(os.Stderr),
 
-		AwsClient: func() (aws.Cloud, error) {
-			cfg, err := cfgFunc()
-			if err != nil {
-				return nil, err
-			}
-			cloudCfg := aws.CloudConfig{
-				Region: cfg.GetAWSRegion(),
-			}
-			return aws.NewCloud(cloudCfg)
-		},
+		Config:     cfgFunc,
+		Logger:     logger,
 		Executable: executable,
 	}, nil
 }

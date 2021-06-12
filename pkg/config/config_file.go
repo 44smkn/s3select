@@ -17,7 +17,7 @@ type FileConfig struct {
 	Proflies  Profiles `yaml:"profiles"`
 }
 
-type Profiles map[string]Profile
+type Profiles = map[string]Profile
 
 type Profile struct {
 	ExpressionType      string              `yaml:"expressionType"`
@@ -69,8 +69,8 @@ func (c *FileConfig) GetAWSRegion() string {
 	return c.AWSRegion
 }
 
-func (c *FileConfig) Profiles() (*Profiles, error) {
-	return &c.Proflies, nil
+func (c *FileConfig) Profiles() (Profiles, error) {
+	return c.Proflies, nil
 }
 
 func ConfigDir() string {
