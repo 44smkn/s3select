@@ -15,20 +15,20 @@ type Factory struct {
 	ErrOut io.Writer
 
 	AwsClient func() (aws.Cloud, error)
-	Config    config.CliConfig
+	Config    config.Config
 
 	Executable string
 }
 
 func NewFactory(appVersion string) (*Factory, error) {
-	var cachedCfg *config.CliConfig
-	var configErr error
-	cfgFunc := func() (*config.CliConfig, error) {
-		if cachedCfg != nil || configErr != nil {
-			return cachedCfg, configErr
+	var cachedCfg config.Config
+	var cfgErr error
+	cfgFunc := func() (config.Config, error) {
+		if cachedCfg != nil || cfgErr != nil {
+			return cachedCfg, cfgErr
 		}
-		// parse
-		return cachedCfg, configErr
+		cachedCfg, cfgErr = config.ParseDefaultConfig()
+		return cachedCfg, cfgErr
 	}
 
 	executable := "s3select"
@@ -46,7 +46,10 @@ func NewFactory(appVersion string) (*Factory, error) {
 			if err != nil {
 				return nil, err
 			}
-			return aws.NewCloud(cfg.AWSConfig)
+			cloudCfg := aws.CloudConfig{
+				Region: cfg.GetAWSRegion(),
+			}
+			return aws.NewCloud(cloudCfg)
 		},
 		Executable: executable,
 	}, nil
