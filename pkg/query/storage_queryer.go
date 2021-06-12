@@ -3,7 +3,6 @@ package query
 import (
 	"context"
 	"io"
-	"strings"
 
 	"github.com/44smkn/s3select/pkg/aws"
 	"github.com/44smkn/s3select/pkg/config"
@@ -11,82 +10,65 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
 	"go.uber.org/zap"
-	"golang.org/x/xerrors"
 )
 
 type StorageQueryer interface {
-	Query(ctx context.Context, bucketName, objectKey string, writer io.Writer)
+	Query(context.Context, *ObjectMetadata, string, io.Writer)
 }
 
-func NewQueryer(cfg config.S3SelectConfig, cloud aws.Cloud) (StorageQueryer, error) {
-	switch et := strings.ToLower(cfg.ExpressionType); et {
-	case "sql":
-		return NewDefaultStorageQueryer(cfg, cloud), nil
-	default:
-		return nil, xerrors.New("Expression type you chose does not match. you must choose from 'SQL'")
-	}
-}
-
-func NewDefaultStorageQueryer(cfg config.S3SelectConfig, cloud aws.Cloud) defaultStorageQueryer {
-	csvInput := csvInputSerialization{
-		fileHeaderInfo:   cfg.InputFileHeaderInfo,
-		fieldDelimiter:   cfg.InputFieldDelimiter,
-		compresssionType: cfg.InputCompressionType,
-	}
-	csvOutput := csvOutputSerialization{
-		recordDelimiter: getOrDefault(cfg.OutputRecordDelimiter, cfg.InputFieldDelimiter),
-	}
+func NewDefaultStorageQueryer(profile *config.Profile, cloud aws.Cloud, logger *zap.Logger) defaultStorageQueryer {
 	return defaultStorageQueryer{
-		cloud:     cloud,
-		csvInput:  csvInput,
-		csvOutput: csvOutput,
+		cfg:    profile,
+		cloud:  cloud,
+		logger: logger,
 	}
 }
 
 var _ StorageQueryer = &defaultStorageQueryer{}
 
 type defaultStorageQueryer struct {
-	cloud      aws.Cloud
-	logger     zap.Logger
-	expression string
-	csvInput   csvInputSerialization
-	csvOutput  csvOutputSerialization
+	cfg    *config.Profile
+	cloud  aws.Cloud
+	logger *zap.Logger
 }
 
-type csvInputSerialization struct {
-	fileHeaderInfo   string
-	compresssionType string
-	fieldDelimiter   string
+type ObjectMetadata struct {
+	BucketName string
+	ObjectKey  string
 }
 
-type csvOutputSerialization struct {
-	recordDelimiter string
-}
-
-func getOrDefault(val, defaultVal string) string {
-	if val != "" {
-		return val
-	}
-	return defaultVal
-}
-
-func (s defaultStorageQueryer) Query(ctx context.Context, bucketName, objectKey string, writer io.Writer) {
+func (s defaultStorageQueryer) Query(ctx context.Context, meta *ObjectMetadata, expression string, writer io.Writer) {
 	input := &s3sdk.SelectObjectContentInput{
-		Bucket:          awssdk.String(bucketName),
-		Key:             awssdk.String(objectKey),
-		ExpressionType:  awssdk.String(s3.ExpressionTypeSql),
-		Expression:      awssdk.String(s.expression),
+		Bucket:          awssdk.String(meta.BucketName),
+		Key:             awssdk.String(meta.ObjectKey),
+		ExpressionType:  awssdk.String(s.cfg.ExpressionType),
+		Expression:      awssdk.String(expression),
 		RequestProgress: &s3.RequestProgress{},
 		InputSerialization: &s3.InputSerialization{
-			CompressionType: awssdk.String(s.csvInput.compresssionType),
+			CompressionType: awssdk.String(s.cfg.ExpressionType),
 			CSV: &s3.CSVInput{
-				FileHeaderInfo: awssdk.String(s.csvInput.fileHeaderInfo),
-				FieldDelimiter: awssdk.String(s.csvInput.fieldDelimiter),
+				AllowQuotedRecordDelimiter: awssdk.Bool(s.cfg.InputSerialization.CSV.AllowQuotedRecordDelimiter),
+				Comments:                   awssdk.String(s.cfg.InputSerialization.CSV.Comments),
+				FieldDelimiter:             awssdk.String(s.cfg.InputSerialization.CSV.FieldDelimiter),
+				FileHeaderInfo:             awssdk.String(s.cfg.InputSerialization.CSV.FileHeaderInfo),
+				QuoteCharacter:             awssdk.String(s.cfg.InputSerialization.CSV.QuoteCharacter),
+				QuoteEscapeCharacter:       awssdk.String(s.cfg.InputSerialization.CSV.QuoteEscapeCharacter),
+				RecordDelimiter:            awssdk.String(s.cfg.InputSerialization.CSV.RecordDelimiter),
+			},
+			JSON: &s3.JSONInput{
+				Type: awssdk.String(s.cfg.InputSerialization.JSON.Type),
 			},
 		},
 		OutputSerialization: &s3.OutputSerialization{
 			CSV: &s3.CSVOutput{
-				FieldDelimiter: awssdk.String(s.csvOutput.recordDelimiter),
+				FieldDelimiter:       awssdk.String(s.cfg.OutputSerialization.CSV.FieldDelimiter),
+				QuoteCharacter:       awssdk.String(s.cfg.OutputSerialization.CSV.QuoteCharacter),
+				QuoteEscapeCharacter: awssdk.String(s.cfg.OutputSerialization.CSV.QuoteEscapeCharacter),
+				QuoteFields:          awssdk.String(s.cfg.OutputSerialization.CSV.QuoteFields),
+				RecordDelimiter:      awssdk.String(s.cfg.OutputSerialization.CSV.RecordDelimiter),
+			},
+			JSON: &s3sdk.JSONOutput{
+				RecordDelimiter: awssdk.String(s.cfg.OutputSerialization.JSON.RecordDelimiter),
 			},
 		},
 	}
