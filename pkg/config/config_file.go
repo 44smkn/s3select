@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/yaml.v2"
 )
 
@@ -13,56 +14,56 @@ const (
 )
 
 type FileConfig struct {
-	AWSRegion string   `yaml:"awsRegion"`
-	Proflies  Profiles `yaml:"profiles"`
+	AWSRegion string   `yaml:"awsRegion,omitempty"`
+	Proflies  Profiles `yaml:"profiles,omitempty"`
 }
 
 type Profiles = map[string]Profile
 
 type Profile struct {
-	ExpressionType      string              `yaml:"expressionType"`
-	InputSerialization  InputSerialization  `yaml:"inputSerialization"`
-	OutputSerialization OutputSerialization `yaml:"outputSerialization"`
+	ExpressionType      string              `yaml:"expressionType,omitempty"`
+	InputSerialization  InputSerialization  `yaml:"inputSerialization,omitempty"`
+	OutputSerialization OutputSerialization `yaml:"outputSerialization,omitempty"`
 }
 
 type InputSerialization struct {
-	CSV             CSVInput     `yaml:"csvInput"`
-	CompressionType string       `yaml:"compressionType"`
-	JSON            JSONInput    `yaml:"jsonInput"`
-	Parquet         ParquetInput `yaml:"parquetInput"`
+	CSV             CSVInput     `yaml:"csvInput,omitempty"`
+	CompressionType string       `yaml:"compressionType,omitempty"`
+	JSON            JSONInput    `yaml:"jsonInput,omitempty"`
+	Parquet         ParquetInput `yaml:"parquetInput,omitempty"`
 }
 
 type CSVInput struct {
-	AllowQuotedRecordDelimiter bool   `yaml:"allowQuotedRecordDelimiter"`
-	Comments                   string `yaml:"comments"`
-	FieldDelimiter             string `yaml:"fieldDelimiter"`
-	FileHeaderInfo             string `yaml:"fileHeaderInfo"`
-	QuoteCharacter             string `yaml:"quoteCharacter"`
-	QuoteEscapeCharacter       string `yaml:"quoteEscapeCharacter"`
-	RecordDelimiter            string `yaml:"recordDelimiter"`
+	AllowQuotedRecordDelimiter bool   `yaml:"allowQuotedRecordDelimiter,omitempty"`
+	Comments                   string `yaml:"comments,omitempty"`
+	FieldDelimiter             string `yaml:"fieldDelimiter,omitempty"`
+	FileHeaderInfo             string `yaml:"fileHeaderInfo,omitempty"`
+	QuoteCharacter             string `yaml:"quoteCharacter,omitempty"`
+	QuoteEscapeCharacter       string `yaml:"quoteEscapeCharacter,omitempty"`
+	RecordDelimiter            string `yaml:"recordDelimiter,omitempty"`
 }
 
 type JSONInput struct {
-	Type string `yaml:"type"`
+	Type string `yaml:"type,omitempty"`
 }
 
 type ParquetInput struct{}
 
 type OutputSerialization struct {
-	CSV  CSVOutput  `yaml:"csvInput"`
-	JSON JSONOutput `yaml:"jsonInput"`
+	CSV  CSVOutput  `yaml:"csvInput,omitempty"`
+	JSON JSONOutput `yaml:"jsonInput,omitempty"`
 }
 
 type CSVOutput struct {
-	FieldDelimiter       string `yaml:"fieldDelimiter"`
-	QuoteCharacter       string `yaml:"quoteCharacter"`
-	QuoteEscapeCharacter string `yaml:"quoteEscapeCharacter"`
-	QuoteFields          string `yaml:"quoteFields"`
-	RecordDelimiter      string `yaml:"recordDelimiter"`
+	FieldDelimiter       string `yaml:"fieldDelimiter,omitempty"`
+	QuoteCharacter       string `yaml:"quoteCharacter,omitempty"`
+	QuoteEscapeCharacter string `yaml:"quoteEscapeCharacter,omitempty"`
+	QuoteFields          string `yaml:"quoteFields,omitempty"`
+	RecordDelimiter      string `yaml:"recordDelimiter,omitempty"`
 }
 
 type JSONOutput struct {
-	RecordDelimiter string `yaml:"recordDelimiter"`
+	RecordDelimiter string `yaml:"recordDelimiter,omitempty"`
 }
 
 func (c *FileConfig) GetAWSRegion() string {
@@ -97,7 +98,34 @@ func parseConfig(filename string) (Config, error) {
 }
 
 func initConfigFile(filename string) {
-	cfg := &FileConfig{} // TODO: Set default Value
+	cfg := &FileConfig{
+		AWSRegion: "us-west-2",
+		Proflies: map[string]Profile{
+			"default": {
+				ExpressionType: s3.ExpressionTypeSql,
+				InputSerialization: InputSerialization{
+					CompressionType: s3.CompressionTypeNone,
+					CSV: CSVInput{
+						AllowQuotedRecordDelimiter: false,
+						FieldDelimiter:             ",",
+						QuoteCharacter:             `"`,
+					},
+					JSON: JSONInput{
+						Type: s3.JSONTypeDocument,
+					},
+				},
+				OutputSerialization: OutputSerialization{
+					CSV: CSVOutput{
+						FieldDelimiter: ",",
+						QuoteCharacter: `"`,
+					},
+					JSON: JSONOutput{
+						RecordDelimiter: "\n",
+					},
+				},
+			},
+		},
+	}
 	cfg.Write(filename)
 }
 
