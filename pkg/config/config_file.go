@@ -124,7 +124,7 @@ func initConfigFile(filename string) {
 						QuoteCharacter: `"`,
 					},
 					JSON: JSONOutput{
-						RecordDelimiter: "\n",
+						RecordDelimiter: `\n`,
 					},
 				},
 			},
