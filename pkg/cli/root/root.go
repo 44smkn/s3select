@@ -28,7 +28,7 @@ func NewCmdRoot(f *cliutil.Factory, version, buildDate string) *cobra.Command {
 	cmd.SetErr(f.ErrOut)
 
 	cmd.AddCommand(versionCmd.NewCmdVersion(version, buildDate))
-	cmd.AddCommand(configureCmd.NewCmdCongigure())
+	cmd.AddCommand(configureCmd.NewCmdCongigure(f))
 	cmd.AddCommand(queryCmd.NewCmdQuery(f))
 
 	cmd.PersistentFlags().Bool("help", false, "Show help for command")
