@@ -49,7 +49,9 @@ func configureRun(opts *ConfigureOptions) error {
 		xerrors.New("Not found your specified profile")
 	}
 	configPrompt(&profile)
-	return nil
+
+	cfg.SetProfile(opts.ProfileKey, profile)
+	return cfg.Write(config.ConfigFile())
 }
 
 func configPrompt(current *config.Profile) *config.Profile {

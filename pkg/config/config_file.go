@@ -74,12 +74,16 @@ func (c *FileConfig) Profiles() (Profiles, error) {
 	return c.Proflies, nil
 }
 
+func (c *FileConfig) SetProfile(key string, newProfile Profile) {
+	c.Proflies[key] = newProfile
+}
+
 func ConfigDir() string {
 	if path := os.Getenv(S3SELECT_CONFIG_DIR); path != "" {
 		return path
 	}
-	dir, _ := os.UserConfigDir()
-	return filepath.Join(dir, "s3select")
+	homeDir, _ := os.UserHomeDir()
+	return filepath.Join(homeDir, ".config", "s3select")
 }
 
 func ConfigFile() string {
