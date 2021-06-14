@@ -98,7 +98,7 @@ func inputCSVFieldDelimiterPrompt(currentVal string) string {
 
 func KeySet(m map[string]string) []string {
 	keyset := make([]string, 0, len(m))
-	for k, _ := range m {
+	for k := range m {
 		keyset = append(keyset, k)
 	}
 	sort.Strings(keyset)
