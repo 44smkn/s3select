@@ -70,6 +70,10 @@ func (c *FileConfig) GetAWSRegion() string {
 	return c.AWSRegion
 }
 
+func (c *FileConfig) SetAWSRegion(region string) {
+	c.AWSRegion = region
+}
+
 func (c *FileConfig) Profiles() (Profiles, error) {
 	return c.Proflies, nil
 }

@@ -40,6 +40,12 @@ func configureRun(opts *ConfigureOptions) error {
 	if err != nil {
 		return err
 	}
+	rp := promptui.Prompt{
+		Label: "Region",
+	}
+	region, _ := rp.Run()
+	cfg.SetAWSRegion(region)
+
 	profiles, err := cfg.Profiles()
 	if err != nil {
 		return err
