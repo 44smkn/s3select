@@ -5,8 +5,8 @@ import (
 	"os"
 
 	"github.com/44smkn/s3select/pkg/build"
+	"github.com/44smkn/s3select/pkg/cli"
 	"github.com/44smkn/s3select/pkg/cli/root"
-	"github.com/44smkn/s3select/pkg/cliutil"
 	"github.com/44smkn/s3select/pkg/log"
 )
 
@@ -37,7 +37,7 @@ func run(args []string) int {
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to generate logger: %s", err.Error())
 	}
-	cliFactory, err := cliutil.NewFactory(buildVersion, logger)
+	cliFactory, err := cli.NewFactory(buildVersion, logger)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to initialize process: %s", err.Error())
 	}

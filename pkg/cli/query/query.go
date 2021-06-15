@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/44smkn/s3select/pkg/aws"
-	"github.com/44smkn/s3select/pkg/cliutil"
+	"github.com/44smkn/s3select/pkg/cli"
 	"github.com/44smkn/s3select/pkg/config"
 	"github.com/44smkn/s3select/pkg/query"
 	awssdk "github.com/aws/aws-sdk-go/aws"
@@ -31,7 +31,7 @@ type QueryOptions struct {
 	Config func() (config.Config, error)
 }
 
-func NewCmdQuery(f *cliutil.Factory) *cobra.Command {
+func NewCmdQuery(f *cli.Factory) *cobra.Command {
 	opts := &QueryOptions{
 		Out:    f.Out,
 		ErrOut: f.ErrOut,

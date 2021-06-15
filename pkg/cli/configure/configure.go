@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/44smkn/s3select/pkg/cliutil"
+	"github.com/44smkn/s3select/pkg/cli"
 	"github.com/44smkn/s3select/pkg/config"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/manifoldco/promptui"
@@ -19,7 +19,7 @@ type ConfigureOptions struct {
 	Config func() (config.Config, error)
 }
 
-func NewCmdCongigure(f *cliutil.Factory) *cobra.Command {
+func NewCmdCongigure(f *cli.Factory) *cobra.Command {
 	opts := ConfigureOptions{
 		Config: f.Config,
 	}
