@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/aws/aws-sdk-go v1.38.20
+	github.com/google/go-cmp v0.3.0
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-colorable v0.0.9
 	github.com/pkg/errors v0.9.1
