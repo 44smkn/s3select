@@ -162,7 +162,7 @@ func writeConfigFile(filename string, data []byte) error {
 }
 
 func parseConfigFile(filename string) (Config, error) {
-	data, err := readConfigFile(filename)
+	data, err := ReadConfigFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -175,7 +175,7 @@ func parseConfigFile(filename string) (Config, error) {
 	return &config, nil
 }
 
-func readConfigFile(filename string) ([]byte, error) {
+var ReadConfigFile = func(filename string) ([]byte, error) {
 	f, err := os.Open(filename)
 	if err != nil {
 		return nil, err
