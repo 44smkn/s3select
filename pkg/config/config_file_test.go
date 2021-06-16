@@ -9,7 +9,7 @@ import (
 	"github.com/44smkn/s3select/pkg/config"
 )
 
-func StubConfig(t *testing.T, configContents string) func() {
+func stubConfig(t *testing.T, configContents string) func() {
 	t.Helper()
 	original := config.ReadConfigFile
 	config.ReadConfigFile = func(filename string) ([]byte, error) {
