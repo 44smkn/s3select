@@ -92,7 +92,7 @@ func queryRun(opts *QueryOptions) error {
 	if !ok {
 		return xerrors.New("your specified profile is not found")
 	}
-	sq := query.NewDefaultStorageQueryer(&profile, cloud, opts.Logger)
+	sq := query.NewDefaultObjectSelector(&profile, cloud, opts.Logger)
 	for _, o := range objects {
 		meta := &query.ObjectMetadata{
 			BucketName: opts.BucketName,
