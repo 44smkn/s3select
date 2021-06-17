@@ -13,7 +13,7 @@ import (
 )
 
 type ObjectSelector interface {
-	Query(context.Context, *ObjectMetadata, string, io.Writer)
+	Select(context.Context, *ObjectMetadata, string, io.Writer)
 }
 
 func NewDefaultObjectSelector(profile *config.Profile, cloud aws.Cloud, logger *zap.Logger) defaultObjectSelector {
@@ -37,7 +37,7 @@ type ObjectMetadata struct {
 	ObjectKey  string
 }
 
-func (s defaultObjectSelector) Query(ctx context.Context, meta *ObjectMetadata, expression string, writer io.Writer) {
+func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata, expression string, writer io.Writer) {
 	input := &s3sdk.SelectObjectContentInput{
 		Bucket:          awssdk.String(meta.BucketName),
 		Key:             awssdk.String(meta.ObjectKey),
