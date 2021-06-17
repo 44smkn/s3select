@@ -8,6 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go/service/s3/s3iface"
 )
 
+//go:generate mockgen -destination=../../../mocks/aws/services/mock_s3.go -package=mock_services github.com/44smkn/s3select/pkg/aws/services S3
 type S3 interface {
 	s3iface.S3API
 
