@@ -12,21 +12,21 @@ import (
 	"go.uber.org/zap"
 )
 
-type StorageQueryer interface {
+type ObjectSelector interface {
 	Query(context.Context, *ObjectMetadata, string, io.Writer)
 }
 
-func NewDefaultStorageQueryer(profile *config.Profile, cloud aws.Cloud, logger *zap.Logger) defaultStorageQueryer {
-	return defaultStorageQueryer{
+func NewDefaultObjectSelector(profile *config.Profile, cloud aws.Cloud, logger *zap.Logger) defaultObjectSelector {
+	return defaultObjectSelector{
 		cfg:    profile,
 		cloud:  cloud,
 		logger: logger,
 	}
 }
 
-var _ StorageQueryer = &defaultStorageQueryer{}
+var _ ObjectSelector = &defaultObjectSelector{}
 
-type defaultStorageQueryer struct {
+type defaultObjectSelector struct {
 	cfg    *config.Profile
 	cloud  aws.Cloud
 	logger *zap.Logger
@@ -37,7 +37,7 @@ type ObjectMetadata struct {
 	ObjectKey  string
 }
 
-func (s defaultStorageQueryer) Query(ctx context.Context, meta *ObjectMetadata, expression string, writer io.Writer) {
+func (s defaultObjectSelector) Query(ctx context.Context, meta *ObjectMetadata, expression string, writer io.Writer) {
 	input := &s3sdk.SelectObjectContentInput{
 		Bucket:          awssdk.String(meta.BucketName),
 		Key:             awssdk.String(meta.ObjectKey),
