@@ -72,7 +72,7 @@ func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata,
 			},
 		},
 	}
-	resp, err := s.cloud.S3().SelectObjectContent(input)
+	resp, err := s.cloud.S3().SelectObjectContentWithContext(ctx, input)
 	if err != nil {
 		s.logger.Error("failed to execute s3select api", zap.String("error", err.Error()))
 	}
