@@ -7,7 +7,9 @@ import (
 	"testing"
 
 	"github.com/44smkn/s3select/pkg/config"
+	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
+	s3sdk "github.com/aws/aws-sdk-go/service/s3"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -38,6 +40,7 @@ profiles:
   default:
     expressionType: SQL
     inputSerialization:
+      formatType: csv
       csvInput:
         fieldDelimiter: ';'
         quoteCharacter: '"'
@@ -45,6 +48,7 @@ profiles:
       jsonInput:
         type: DOCUMENT
     outputSerialization:
+      formatType: csv
       csvInput:
         fieldDelimiter: ' '
         quoteCharacter: '"'
@@ -53,6 +57,7 @@ profiles:
   albAcesssLog:
     expressionType: SQL
     inputSerialization:
+      formatType: csv
       csvInput:
         allowQuotedRecordDelimiter: true
         comments: '#'
@@ -65,6 +70,7 @@ profiles:
       jsonInput:
         type: DOCUMENT
     outputSerialization:
+      formatType: csv
       csvInput:
         fieldDelimiter: ','
         quoteCharacter: '"'
@@ -82,54 +88,58 @@ profiles:
 		AWSRegion: "ap-northeast-1",
 		Proflies: map[string]config.Profile{
 			"default": {
-				ExpressionType: s3.ExpressionTypeSql,
+				ExpressionType: s3sdk.ExpressionTypeSql,
 				InputSerialization: config.InputSerialization{
-					CompressionType: s3.CompressionTypeBzip2,
+					FormatType:      "csv",
+					CompressionType: awssdk.String(s3sdk.CompressionTypeBzip2),
 					CSV: config.CSVInput{
-						FieldDelimiter: ";",
-						QuoteCharacter: `"`,
+						FieldDelimiter: awssdk.String(";"),
+						QuoteCharacter: awssdk.String(`"`),
 					},
 					JSON: config.JSONInput{
-						Type: s3.JSONTypeDocument,
+						Type: awssdk.String(s3sdk.JSONTypeDocument),
 					},
 				},
 				OutputSerialization: config.OutputSerialization{
+					FormatType: "csv",
 					CSV: config.CSVOutput{
-						FieldDelimiter: " ",
-						QuoteCharacter: `"`,
+						FieldDelimiter: awssdk.String(" "),
+						QuoteCharacter: awssdk.String(`"`),
 					},
 					JSON: config.JSONOutput{
-						RecordDelimiter: `\n`,
+						RecordDelimiter: awssdk.String(`\n`),
 					},
 				},
 			},
 			"albAcesssLog": {
 				ExpressionType: s3.ExpressionTypeSql,
 				InputSerialization: config.InputSerialization{
-					CompressionType: s3.CompressionTypeGzip,
+					FormatType:      "csv",
+					CompressionType: awssdk.String(s3.CompressionTypeGzip),
 					CSV: config.CSVInput{
-						AllowQuotedRecordDelimiter: true,
-						Comments:                   "#",
-						FieldDelimiter:             " ",
-						FileHeaderInfo:             s3.FileHeaderInfoIgnore,
-						QuoteCharacter:             `"`,
-						QuoteEscapeCharacter:       `"`,
-						RecordDelimiter:            `\n`,
+						AllowQuotedRecordDelimiter: awssdk.Bool(true),
+						Comments:                   awssdk.String("#"),
+						FieldDelimiter:             awssdk.String(" "),
+						FileHeaderInfo:             awssdk.String(s3.FileHeaderInfoIgnore),
+						QuoteCharacter:             awssdk.String(`"`),
+						QuoteEscapeCharacter:       awssdk.String(`"`),
+						RecordDelimiter:            awssdk.String(`\n`),
 					},
 					JSON: config.JSONInput{
-						Type: s3.JSONTypeDocument,
+						Type: awssdk.String(s3.JSONTypeDocument),
 					},
 				},
 				OutputSerialization: config.OutputSerialization{
+					FormatType: "csv",
 					CSV: config.CSVOutput{
-						FieldDelimiter:       ",",
-						QuoteCharacter:       `"`,
-						QuoteEscapeCharacter: `"`,
-						QuoteFields:          s3.QuoteFieldsAsneeded,
-						RecordDelimiter:      `\n`,
+						FieldDelimiter:       awssdk.String(","),
+						QuoteCharacter:       awssdk.String(`"`),
+						QuoteEscapeCharacter: awssdk.String(`"`),
+						QuoteFields:          awssdk.String(s3.QuoteFieldsAsneeded),
+						RecordDelimiter:      awssdk.String(`\n`),
 					},
 					JSON: config.JSONOutput{
-						RecordDelimiter: `\n`,
+						RecordDelimiter: awssdk.String(`\n`),
 					},
 				},
 			},
