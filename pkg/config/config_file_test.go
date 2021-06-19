@@ -89,34 +89,34 @@ profiles:
 		Proflies: map[string]config.Profile{
 			"default": {
 				ExpressionType: s3sdk.ExpressionTypeSql,
-				InputSerialization: config.InputSerialization{
+				InputSerialization: &config.InputSerialization{
 					FormatType:      "csv",
 					CompressionType: awssdk.String(s3sdk.CompressionTypeBzip2),
-					CSV: config.CSVInput{
+					CSV: &config.CSVInput{
 						FieldDelimiter: awssdk.String(";"),
 						QuoteCharacter: awssdk.String(`"`),
 					},
-					JSON: config.JSONInput{
+					JSON: &config.JSONInput{
 						Type: awssdk.String(s3sdk.JSONTypeDocument),
 					},
 				},
-				OutputSerialization: config.OutputSerialization{
+				OutputSerialization: &config.OutputSerialization{
 					FormatType: "csv",
-					CSV: config.CSVOutput{
+					CSV: &config.CSVOutput{
 						FieldDelimiter: awssdk.String(" "),
 						QuoteCharacter: awssdk.String(`"`),
 					},
-					JSON: config.JSONOutput{
+					JSON: &config.JSONOutput{
 						RecordDelimiter: awssdk.String(`\n`),
 					},
 				},
 			},
 			"albAcesssLog": {
 				ExpressionType: s3.ExpressionTypeSql,
-				InputSerialization: config.InputSerialization{
+				InputSerialization: &config.InputSerialization{
 					FormatType:      "csv",
 					CompressionType: awssdk.String(s3.CompressionTypeGzip),
-					CSV: config.CSVInput{
+					CSV: &config.CSVInput{
 						AllowQuotedRecordDelimiter: awssdk.Bool(true),
 						Comments:                   awssdk.String("#"),
 						FieldDelimiter:             awssdk.String(" "),
@@ -125,20 +125,20 @@ profiles:
 						QuoteEscapeCharacter:       awssdk.String(`"`),
 						RecordDelimiter:            awssdk.String(`\n`),
 					},
-					JSON: config.JSONInput{
+					JSON: &config.JSONInput{
 						Type: awssdk.String(s3.JSONTypeDocument),
 					},
 				},
-				OutputSerialization: config.OutputSerialization{
+				OutputSerialization: &config.OutputSerialization{
 					FormatType: "csv",
-					CSV: config.CSVOutput{
+					CSV: &config.CSVOutput{
 						FieldDelimiter:       awssdk.String(","),
 						QuoteCharacter:       awssdk.String(`"`),
 						QuoteEscapeCharacter: awssdk.String(`"`),
 						QuoteFields:          awssdk.String(s3.QuoteFieldsAsneeded),
 						RecordDelimiter:      awssdk.String(`\n`),
 					},
-					JSON: config.JSONOutput{
+					JSON: &config.JSONOutput{
 						RecordDelimiter: awssdk.String(`\n`),
 					},
 				},

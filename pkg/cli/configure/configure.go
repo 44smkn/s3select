@@ -6,15 +6,45 @@ import (
 
 	"github.com/44smkn/s3select/pkg/cli"
 	"github.com/44smkn/s3select/pkg/config"
+	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"golang.org/x/xerrors"
 )
 
+var (
+	awsRegions = []string{
+		"us-east-2",
+		"us-east-1",
+		"us-west-1",
+		"us-west-2",
+		"af-south-1",
+		"ap-east-1",
+		"ap-south-1",
+		"ap-northeast-3",
+		"ap-northeast-2",
+		"ap-southeast-1",
+		"ap-southeast-2",
+		"ap-northeast-1",
+		"ca-central-1",
+		"cn-north-1",
+		"cn-northwest-1",
+		"eu-central-1",
+		"eu-west-1",
+		"eu-west-2",
+		"eu-south-1",
+		"eu-west-3",
+		"eu-north-1",
+		"me-south-1",
+		"sa-east-1",
+	}
+)
+
 type ConfigureOptions struct {
-	ProfileKey string
-	ProfileVal *config.Profile
+	ProfileKey      string
+	ProfileVal      *config.Profile
+	CongigureDetail bool
 
 	Config func() (config.Config, error)
 }
@@ -32,6 +62,7 @@ func NewCmdCongigure(f *cli.Factory) *cobra.Command {
 	}
 
 	cmd.Flags().StringVarP(&opts.ProfileKey, "profile", "p", "default", "PROFILE")
+	cmd.Flags().BoolVar(&opts.CongigureDetail, "detail", false, "configure s3select in detail")
 	return cmd
 }
 
@@ -40,47 +71,78 @@ func configureRun(opts *ConfigureOptions) error {
 	if err != nil {
 		return err
 	}
-	rp := promptui.Prompt{
-		Label: "Region",
+
+	region, err := regionPrompt()
+	if err != nil {
+		return err
 	}
-	region, _ := rp.Run()
 	cfg.SetAWSRegion(region)
 
 	profiles, err := cfg.Profiles()
 	if err != nil {
 		return err
 	}
+
 	profile, ok := profiles[opts.ProfileKey]
 	if !ok {
-		xerrors.New("Not found your specified profile")
+		profile = config.NewDefaultProfile()
 	}
-	configPrompt(&profile)
 
+	is, err := inputSerializationPrompt(profile.InputSerialization, opts.CongigureDetail)
+	if err != nil {
+		return err
+	}
+	os, err := outputSerializationPrompt(profile.OutputSerialization, opts.CongigureDetail)
+	if err != nil {
+		return err
+	}
+	profile.SetSerializations(is, os)
 	cfg.SetProfile(opts.ProfileKey, profile)
 	return cfg.Write(config.ConfigFile())
 }
 
-func configPrompt(current *config.Profile) *config.Profile {
-	current.InputSerialization.CompressionType =
-		compressionTypePrompt(current.InputSerialization.CompressionType)
-
-	current.InputSerialization.CSV.FieldDelimiter =
-		inputCSVFieldDelimiterPrompt(current.InputSerialization.CSV.FieldDelimiter)
-
-	return current
-}
-
-func selectPrompt(label string, items []string) *string {
-	p := promptui.Select{
-		Label: label,
-		Items: items,
+func regionPrompt() (string, error) {
+	rp := promptui.Prompt{
+		Label: "Region",
+		Validate: func(input string) error {
+			for _, r := range awsRegions {
+				if input == r {
+					return nil
+				}
+			}
+			return xerrors.New("your specified region does not exists")
+		},
 	}
-	_, result, _ := p.Run()
-	return &result
+	return rp.Run()
 }
 
-func compressionTypePrompt(currentVal *string) *string {
-	label := fmt.Sprintf("Select CompressionType [%s]", *currentVal)
+func inputSerializationPrompt(cfg *config.InputSerialization, detail bool) (*config.InputSerialization, error) {
+	inputFormat := inputFormatTypePrompt(cfg.FormatType)
+	switch inputFormat {
+	case config.S3SELECT_INPUT_FORMAT_CSV:
+		if !detail {
+			return &config.InputSerialization{
+				FormatType:      config.S3SELECT_INPUT_FORMAT_CSV,
+				CompressionType: awssdk.String(compressionTypePrompt(*cfg.CompressionType)),
+				CSV: &config.CSVInput{
+					FieldDelimiter: awssdk.String(csvFieldDelimiterPrompt(*cfg.CSV.FieldDelimiter)),
+				},
+			}, nil
+		}
+	}
+	return nil, xerrors.New("choose a input format type from: [json, csv]")
+}
+
+func inputFormatTypePrompt(current string) string {
+	label := fmt.Sprintf("Select Input Format Type [%s]", current)
+	return selectPrompt(label, []string{
+		config.S3SELECT_INPUT_FORMAT_CSV,
+		config.S3SELECT_INPUT_FORMAT_JSON,
+	})
+}
+
+func compressionTypePrompt(current string) string {
+	label := fmt.Sprintf("Select CompressionType [%s]", current)
 	return selectPrompt(label, []string{
 		s3.CompressionTypeNone,
 		s3.CompressionTypeGzip,
@@ -95,11 +157,44 @@ var seprateCharacterMap = map[string]string{
 	"SEMICOLON": ";",
 }
 
-func inputCSVFieldDelimiterPrompt(currentVal *string) *string {
-	label := fmt.Sprintf("Select Input CSV Field Delimiter [%s]", getKeyByValue(seprateCharacterMap, *currentVal))
+func csvFieldDelimiterPrompt(current string) string {
+	label := fmt.Sprintf("Select Input CSV Field Delimiter [%s]", getKeyByValue(seprateCharacterMap, current))
 	key := selectPrompt(label, KeySet(seprateCharacterMap))
-	val, _ := seprateCharacterMap[*key]
-	return &val
+	val, _ := seprateCharacterMap[key]
+	return val
+}
+
+func outputSerializationPrompt(cfg *config.OutputSerialization, detail bool) (*config.OutputSerialization, error) {
+	inputFormat := outputFormatTypePrompt(cfg.FormatType)
+	switch inputFormat {
+	case config.S3SELECT_INPUT_FORMAT_CSV:
+		if !detail {
+			return &config.OutputSerialization{
+				FormatType: config.S3SELECT_INPUT_FORMAT_CSV,
+				CSV: &config.CSVOutput{
+					FieldDelimiter: awssdk.String(csvFieldDelimiterPrompt(*cfg.CSV.FieldDelimiter)),
+				},
+			}, nil
+		}
+	}
+	return nil, xerrors.New("choose a input format type from: [json, csv]")
+}
+
+func outputFormatTypePrompt(current string) string {
+	label := fmt.Sprintf("Select Output Format Type [%s]", current)
+	return selectPrompt(label, []string{
+		config.S3SELECT_INPUT_FORMAT_CSV,
+		config.S3SELECT_INPUT_FORMAT_JSON,
+	})
+}
+
+func selectPrompt(label string, items []string) string {
+	p := promptui.Select{
+		Label: label,
+		Items: items,
+	}
+	_, result, _ := p.Run()
+	return result
 }
 
 func KeySet(m map[string]string) []string {

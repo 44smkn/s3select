@@ -24,17 +24,17 @@ type FileConfig struct {
 type Profiles = map[string]Profile
 
 type Profile struct {
-	ExpressionType      string              `yaml:"expressionType,omitempty"`
-	InputSerialization  InputSerialization  `yaml:"inputSerialization,omitempty"`
-	OutputSerialization OutputSerialization `yaml:"outputSerialization,omitempty"`
+	ExpressionType      string               `yaml:"expressionType,omitempty"`
+	InputSerialization  *InputSerialization  `yaml:"inputSerialization,omitempty"`
+	OutputSerialization *OutputSerialization `yaml:"outputSerialization,omitempty"`
 }
 
 type InputSerialization struct {
-	FormatType      string       `yaml:"formatType,omitempty"`
-	CSV             CSVInput     `yaml:"csvInput,omitempty"`
-	CompressionType *string      `yaml:"compressionType,omitempty"`
-	JSON            JSONInput    `yaml:"jsonInput,omitempty"`
-	Parquet         ParquetInput `yaml:"parquetInput,omitempty"`
+	FormatType      string        `yaml:"formatType,omitempty"`
+	CSV             *CSVInput     `yaml:"csvInput,omitempty"`
+	CompressionType *string       `yaml:"compressionType,omitempty"`
+	JSON            *JSONInput    `yaml:"jsonInput,omitempty"`
+	Parquet         *ParquetInput `yaml:"parquetInput,omitempty"`
 }
 
 type CSVInput struct {
@@ -54,9 +54,9 @@ type JSONInput struct {
 type ParquetInput struct{}
 
 type OutputSerialization struct {
-	FormatType string     `yaml:"formatType,omitempty"`
-	CSV        CSVOutput  `yaml:"csvInput,omitempty"`
-	JSON       JSONOutput `yaml:"jsonInput,omitempty"`
+	FormatType string      `yaml:"formatType,omitempty"`
+	CSV        *CSVOutput  `yaml:"csvInput,omitempty"`
+	JSON       *JSONOutput `yaml:"jsonInput,omitempty"`
 }
 
 type CSVOutput struct {
@@ -114,31 +114,35 @@ func initConfigFile(filename string) {
 	cfg := &FileConfig{
 		AWSRegion: "us-west-2",
 		Proflies: map[string]Profile{
-			"default": {
-				ExpressionType: s3.ExpressionTypeSql,
-				InputSerialization: InputSerialization{
-					CompressionType: aws.String(s3.CompressionTypeNone),
-					CSV: CSVInput{
-						FieldDelimiter: aws.String(","),
-						QuoteCharacter: aws.String(`"`),
-					},
-					JSON: JSONInput{
-						Type: aws.String(s3.JSONTypeDocument),
-					},
-				},
-				OutputSerialization: OutputSerialization{
-					CSV: CSVOutput{
-						FieldDelimiter: aws.String(","),
-						QuoteCharacter: aws.String(`"`),
-					},
-					JSON: JSONOutput{
-						RecordDelimiter: aws.String(`\n`),
-					},
-				},
-			},
+			"default": NewDefaultProfile(),
 		},
 	}
 	cfg.Write(filename)
+}
+
+func NewDefaultProfile() Profile {
+	return Profile{
+		ExpressionType: s3.ExpressionTypeSql,
+		InputSerialization: &InputSerialization{
+			CompressionType: aws.String(s3.CompressionTypeNone),
+			CSV: &CSVInput{
+				FieldDelimiter: aws.String(","),
+				QuoteCharacter: aws.String(`"`),
+			},
+			JSON: &JSONInput{
+				Type: aws.String(s3.JSONTypeDocument),
+			},
+		},
+		OutputSerialization: &OutputSerialization{
+			CSV: &CSVOutput{
+				FieldDelimiter: aws.String(","),
+				QuoteCharacter: aws.String(`"`),
+			},
+			JSON: &JSONOutput{
+				RecordDelimiter: aws.String(`\n`),
+			},
+		},
+	}
 }
 
 func (c *FileConfig) Write(filename string) error {
@@ -197,4 +201,9 @@ var ReadConfigFile = func(filename string) ([]byte, error) {
 func fileExists(path string) bool {
 	f, err := os.Stat(path)
 	return err == nil && !f.IsDir()
+}
+
+func (p *Profile) SetSerializations(is *InputSerialization, os *OutputSerialization) {
+	p.InputSerialization = is
+	p.OutputSerialization = os
 }

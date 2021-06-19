@@ -72,7 +72,7 @@ func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata,
 	return nil
 }
 
-func newInputSerialization(cfg config.InputSerialization) (*s3sdk.InputSerialization, error) {
+func newInputSerialization(cfg *config.InputSerialization) (*s3sdk.InputSerialization, error) {
 	switch cfg.FormatType {
 	case config.S3SELECT_INPUT_FORMAT_CSV:
 		return &s3.InputSerialization{
@@ -98,7 +98,7 @@ func newInputSerialization(cfg config.InputSerialization) (*s3sdk.InputSerializa
 	}
 }
 
-func newOutputSerialization(cfg config.OutputSerialization) (*s3sdk.OutputSerialization, error) {
+func newOutputSerialization(cfg *config.OutputSerialization) (*s3sdk.OutputSerialization, error) {
 	switch cfg.FormatType {
 	case config.S3SELECT_INPUT_FORMAT_CSV:
 		return &s3.OutputSerialization{
