@@ -19,8 +19,8 @@ func NewCmdRoot(f *cli.Factory, version, buildDate string) *cobra.Command {
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Example: heredoc.Doc(`
-			$ s3slct configure
-			$ s3slct query -b bucket -p path/to/item -s 'SELECT * LIMIT 10'
+			$ s3select configure
+			$ s3select query -b bucket -k path/to/prefix -p default -s 'SELECT * LIMIT 10'
 		`),
 	}
 
