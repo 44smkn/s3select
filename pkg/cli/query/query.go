@@ -98,7 +98,10 @@ func queryRun(opts *QueryOptions) error {
 			BucketName: opts.BucketName,
 			ObjectKey:  *o.Key,
 		}
-		sq.Select(ctx, meta, opts.Expression, opts.Out)
+		err = sq.Select(ctx, meta, opts.Expression, opts.Out)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
