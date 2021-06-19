@@ -5,12 +5,15 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"gopkg.in/yaml.v2"
 )
 
 const (
-	S3SELECT_CONFIG_DIR = "S3SELECT_CONFIG_DIR"
+	S3SELECT_CONFIG_DIR        = "S3SELECT_CONFIG_DIR"
+	S3SELECT_INPUT_FORMAT_CSV  = "csv"
+	S3SELECT_INPUT_FORMAT_JSON = "json"
 )
 
 type FileConfig struct {
@@ -27,43 +30,45 @@ type Profile struct {
 }
 
 type InputSerialization struct {
+	FormatType      string       `yaml:"formatType,omitempty"`
 	CSV             CSVInput     `yaml:"csvInput,omitempty"`
-	CompressionType string       `yaml:"compressionType,omitempty"`
+	CompressionType *string      `yaml:"compressionType,omitempty"`
 	JSON            JSONInput    `yaml:"jsonInput,omitempty"`
 	Parquet         ParquetInput `yaml:"parquetInput,omitempty"`
 }
 
 type CSVInput struct {
-	AllowQuotedRecordDelimiter bool   `yaml:"allowQuotedRecordDelimiter,omitempty"`
-	Comments                   string `yaml:"comments,omitempty"`
-	FieldDelimiter             string `yaml:"fieldDelimiter,omitempty"`
-	FileHeaderInfo             string `yaml:"fileHeaderInfo,omitempty"`
-	QuoteCharacter             string `yaml:"quoteCharacter,omitempty"`
-	QuoteEscapeCharacter       string `yaml:"quoteEscapeCharacter,omitempty"`
-	RecordDelimiter            string `yaml:"recordDelimiter,omitempty"`
+	AllowQuotedRecordDelimiter *bool   `yaml:"allowQuotedRecordDelimiter,omitempty"`
+	Comments                   *string `yaml:"comments,omitempty"`
+	FieldDelimiter             *string `yaml:"fieldDelimiter,omitempty"`
+	FileHeaderInfo             *string `yaml:"fileHeaderInfo,omitempty"`
+	QuoteCharacter             *string `yaml:"quoteCharacter,omitempty"`
+	QuoteEscapeCharacter       *string `yaml:"quoteEscapeCharacter,omitempty"`
+	RecordDelimiter            *string `yaml:"recordDelimiter,omitempty"`
 }
 
 type JSONInput struct {
-	Type string `yaml:"type,omitempty"`
+	Type *string `yaml:"type,omitempty"`
 }
 
 type ParquetInput struct{}
 
 type OutputSerialization struct {
-	CSV  CSVOutput  `yaml:"csvInput,omitempty"`
-	JSON JSONOutput `yaml:"jsonInput,omitempty"`
+	FormatType string     `yaml:"formatType,omitempty"`
+	CSV        CSVOutput  `yaml:"csvInput,omitempty"`
+	JSON       JSONOutput `yaml:"jsonInput,omitempty"`
 }
 
 type CSVOutput struct {
-	FieldDelimiter       string `yaml:"fieldDelimiter,omitempty"`
-	QuoteCharacter       string `yaml:"quoteCharacter,omitempty"`
-	QuoteEscapeCharacter string `yaml:"quoteEscapeCharacter,omitempty"`
-	QuoteFields          string `yaml:"quoteFields,omitempty"`
-	RecordDelimiter      string `yaml:"recordDelimiter,omitempty"`
+	FieldDelimiter       *string `yaml:"fieldDelimiter,omitempty"`
+	QuoteCharacter       *string `yaml:"quoteCharacter,omitempty"`
+	QuoteEscapeCharacter *string `yaml:"quoteEscapeCharacter,omitempty"`
+	QuoteFields          *string `yaml:"quoteFields,omitempty"`
+	RecordDelimiter      *string `yaml:"recordDelimiter,omitempty"`
 }
 
 type JSONOutput struct {
-	RecordDelimiter string `yaml:"recordDelimiter,omitempty"`
+	RecordDelimiter *string `yaml:"recordDelimiter,omitempty"`
 }
 
 func (c *FileConfig) GetAWSRegion() string {
@@ -112,23 +117,22 @@ func initConfigFile(filename string) {
 			"default": {
 				ExpressionType: s3.ExpressionTypeSql,
 				InputSerialization: InputSerialization{
-					CompressionType: s3.CompressionTypeNone,
+					CompressionType: aws.String(s3.CompressionTypeNone),
 					CSV: CSVInput{
-						AllowQuotedRecordDelimiter: false,
-						FieldDelimiter:             ",",
-						QuoteCharacter:             `"`,
+						FieldDelimiter: aws.String(","),
+						QuoteCharacter: aws.String(`"`),
 					},
 					JSON: JSONInput{
-						Type: s3.JSONTypeDocument,
+						Type: aws.String(s3.JSONTypeDocument),
 					},
 				},
 				OutputSerialization: OutputSerialization{
 					CSV: CSVOutput{
-						FieldDelimiter: ",",
-						QuoteCharacter: `"`,
+						FieldDelimiter: aws.String(","),
+						QuoteCharacter: aws.String(`"`),
 					},
 					JSON: JSONOutput{
-						RecordDelimiter: `\n`,
+						RecordDelimiter: aws.String(`\n`),
 					},
 				},
 			},

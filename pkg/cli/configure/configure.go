@@ -70,17 +70,17 @@ func configPrompt(current *config.Profile) *config.Profile {
 	return current
 }
 
-func selectPrompt(label string, items []string) string {
+func selectPrompt(label string, items []string) *string {
 	p := promptui.Select{
 		Label: label,
 		Items: items,
 	}
 	_, result, _ := p.Run()
-	return result
+	return &result
 }
 
-func compressionTypePrompt(currentVal string) string {
-	label := fmt.Sprintf("Select CompressionType [%s]", currentVal)
+func compressionTypePrompt(currentVal *string) *string {
+	label := fmt.Sprintf("Select CompressionType [%s]", *currentVal)
 	return selectPrompt(label, []string{
 		s3.CompressionTypeNone,
 		s3.CompressionTypeGzip,
@@ -95,11 +95,11 @@ var seprateCharacterMap = map[string]string{
 	"SEMICOLON": ";",
 }
 
-func inputCSVFieldDelimiterPrompt(currentVal string) string {
-	label := fmt.Sprintf("Select Input CSV Field Delimiter [%s]", getKeyByValue(seprateCharacterMap, currentVal))
+func inputCSVFieldDelimiterPrompt(currentVal *string) *string {
+	label := fmt.Sprintf("Select Input CSV Field Delimiter [%s]", getKeyByValue(seprateCharacterMap, *currentVal))
 	key := selectPrompt(label, KeySet(seprateCharacterMap))
-	val, _ := seprateCharacterMap[key]
-	return val
+	val, _ := seprateCharacterMap[*key]
+	return &val
 }
 
 func KeySet(m map[string]string) []string {
