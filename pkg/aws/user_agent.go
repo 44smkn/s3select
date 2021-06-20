@@ -5,15 +5,15 @@ import (
 
 	"github.com/44smkn/s3select/pkg/build"
 
-	"github.com/aws/aws-sdk-go/aws/request"
+	awsrequest "github.com/aws/aws-sdk-go/aws/request"
 )
 
 const appName = "s3select"
 
 // injectUserAgent will inject app specific user-agent into awsSDK
-func injectUserAgent(handlers *request.Handlers) {
-	handlers.Build.PushFrontNamed(request.NamedHandler{
+func injectUserAgent(handlers *awsrequest.Handlers) {
+	handlers.Build.PushFrontNamed(awsrequest.NamedHandler{
 		Name: fmt.Sprintf("%s/user-agent", appName),
-		Fn:   request.MakeAddToUserAgentHandler(appName, build.Version),
+		Fn:   awsrequest.MakeAddToUserAgentHandler(appName, build.Version),
 	})
 }

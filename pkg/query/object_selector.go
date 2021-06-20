@@ -7,6 +7,8 @@ import (
 	"github.com/44smkn/s3select/pkg/aws"
 	"github.com/44smkn/s3select/pkg/config"
 	awssdk "github.com/aws/aws-sdk-go/aws"
+	awsclient "github.com/aws/aws-sdk-go/aws/client"
+	awsrequest "github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
 	"go.uber.org/zap"
@@ -48,15 +50,19 @@ func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata,
 		return err
 	}
 	input := &s3sdk.SelectObjectContentInput{
-		Bucket:              awssdk.String(meta.BucketName),
-		Key:                 awssdk.String(meta.ObjectKey),
-		ExpressionType:      awssdk.String(s.cfg.ExpressionType),
-		Expression:          awssdk.String(expression),
-		RequestProgress:     &s3.RequestProgress{},
+		Bucket:         awssdk.String(meta.BucketName),
+		Key:            awssdk.String(meta.ObjectKey),
+		ExpressionType: awssdk.String(s.cfg.ExpressionType),
+		Expression:     awssdk.String(expression),
+		RequestProgress: &s3.RequestProgress{
+			Enabled: awssdk.Bool(false),
+		},
 		InputSerialization:  is,
 		OutputSerialization: os,
 	}
-	resp, err := s.cloud.S3().SelectObjectContentWithContext(ctx, input)
+	resp, err := s.cloud.S3().SelectObjectContentWithContext(ctx, input, func(r *awsrequest.Request) {
+		r.Handlers.Send.RemoveByName(awsclient.LogHTTPResponseHeaderHandler.Name)
+	})
 	if err != nil {
 		return xerrors.Errorf("failed to execute s3api: %w", err)
 	}
