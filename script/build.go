@@ -14,7 +14,7 @@ var tasks = map[string]func(string) error{
 		ldflags := os.Getenv("GO_LDFLAGS")
 		ldflags = fmt.Sprintf("-X github.com/44smkn/s3select/pkg/build.Version=%s %s", version(), ldflags)
 		ldflags = fmt.Sprintf("-X github.com/44smkn/s3select/pkg/build.Date=%s %s", date(), ldflags)
-		return run("go", "build", "-trimpath", "-ldflags", ldflags, "-o", "exe", "./cmd/s3select")
+		return run("go", "build", "-trimpath", "-ldflags", ldflags, "-o", exe, "./cmd/s3select")
 	},
 	"clean": func(_ string) error {
 		return rmrf("bin")
