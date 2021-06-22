@@ -2,7 +2,7 @@ name: Tests
 on: [push, pull_request]
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
 
     steps:
       - name: Set up Go 1.16
