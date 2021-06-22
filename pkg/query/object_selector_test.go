@@ -27,13 +27,13 @@ func Test_defaultObjectSelector_Select(t *testing.T) {
 	output := &s3sdk.SelectObjectContentOutput{
 		EventStream: es,
 	}
-	m.EXPECT().SelectObjectContentWithContext(gomock.Any(), gomock.Any()).Return(output, nil)
+	m.EXPECT().SelectObjectContentWithContext(gomock.Any(), gomock.Any(), gomock.Any()).Return(output, nil)
 
-	profile := &config.Profile{}
+	profile := config.NewDefaultProfile()
 	cloud := &fakeAwsCloud{
 		s3: m,
 	}
-	selector := query.NewDefaultObjectSelector(profile, cloud, zap.L())
+	selector := query.NewDefaultObjectSelector(&profile, cloud, zap.L())
 	ctx := context.Background()
 	meta := &query.ObjectMetadata{
 		BucketName: "fakeBucket",
@@ -44,10 +44,13 @@ func Test_defaultObjectSelector_Select(t *testing.T) {
 		time.Sleep(10 * time.Second)
 		output.GetEventStream().Close()
 	}()
-	selector.Select(ctx, meta, "Fake Expression", buf)
+	err := selector.Select(ctx, meta, "Fake Expression", buf)
+	if err != nil {
+		t.Errorf("failed to select: %s", err.Error())
+	}
 
-	if buf.String() != "summary" {
-		t.Errorf("failed to ---")
+	if got := buf.String(); got != "summary" {
+		t.Errorf("mismatch want: %s got: %s", "summary", got)
 	}
 }
 
