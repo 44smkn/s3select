@@ -124,6 +124,7 @@ func NewDefaultProfile() Profile {
 	return Profile{
 		ExpressionType: s3.ExpressionTypeSql,
 		InputSerialization: &InputSerialization{
+			FormatType:      S3SELECT_INPUT_FORMAT_CSV,
 			CompressionType: aws.String(s3.CompressionTypeNone),
 			CSV: &CSVInput{
 				FieldDelimiter: aws.String(","),
@@ -134,6 +135,7 @@ func NewDefaultProfile() Profile {
 			},
 		},
 		OutputSerialization: &OutputSerialization{
+			FormatType: S3SELECT_INPUT_FORMAT_CSV,
 			CSV: &CSVOutput{
 				FieldDelimiter: aws.String(","),
 				QuoteCharacter: aws.String(`"`),
