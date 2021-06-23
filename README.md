@@ -29,7 +29,7 @@ To retrive subset of s3object, run:
 
 ```sh
 s3select configure --profile alb-accesslog
-s3select query -b $BUCKET -k $KEY_PREFIX -p alb-accesslog -e 'SELECT s._2, s._2, s._4 FROM s3object s LIMIT 10'
+s3select query -b $BUCKET -k $KEY_PREFIX -p alb-accesslog -e "SELECT s._9 as elb_status_code, s._13 as request FROM s3object s WHERE s._1 = 'https'
 ```
 
 The result of running the query will be output stdout.
