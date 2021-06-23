@@ -43,9 +43,8 @@ func run(args []string) int {
 	}
 	rootCmd := root.NewCmdRoot(cliFactory, buildVersion, buildDate)
 
-	if cmd, err := rootCmd.ExecuteC(); err != nil {
-		// TODO: error handling
-		fmt.Fprintln(os.Stderr, cmd.UsageString())
+	if _, err := rootCmd.ExecuteC(); err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
 	return ExitCodeOK
