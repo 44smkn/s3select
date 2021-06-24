@@ -8,7 +8,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.3.0
 	github.com/manifoldco/promptui v0.8.0
-	github.com/mattn/go-colorable v0.0.9
+	github.com/mattn/go-colorable v0.1.8
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.1.3
 	github.com/stretchr/testify v1.7.0 // indirect
