@@ -6,7 +6,7 @@ require (
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/aws/aws-sdk-go v1.38.66
 	github.com/golang/mock v1.6.0
-	github.com/google/go-cmp v0.3.0
+	github.com/google/go-cmp v0.5.6
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-colorable v0.0.9
 	github.com/pkg/errors v0.9.1
