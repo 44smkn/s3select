@@ -3,7 +3,7 @@ module github.com/44smkn/s3select
 go 1.16
 
 require (
-	github.com/MakeNowJust/heredoc/v2 v2.0.1
+	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/aws/aws-sdk-go v1.38.66
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.3.0
