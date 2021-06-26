@@ -14,12 +14,7 @@ This demo sets s3select configuration up and retrive data from s3 using s3select
 
 ## Installation
 
-To download the latest release, run:
-
-```bash
-curl -sL "https://github.com/44smkn/s3select/releases/latest/download/s3select_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
-sudo mv /tmp/s3select /usr/local/bin
-```
+Download packaged binaries from the [releases page](https://github.com/44smkn/s3select/releases).
 
 You will need to have AWS API credentials configured. What works for AWS CLI, should be sufficient. You can use [~/.aws/credentials file](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) or [environment variables](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html#envvars-set).
 
