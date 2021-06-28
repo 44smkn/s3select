@@ -5,14 +5,15 @@ import (
 	"io"
 
 	"github.com/44smkn/s3select/pkg/aws"
+	"github.com/44smkn/s3select/pkg/cli"
 	"github.com/44smkn/s3select/pkg/config"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	awsclient "github.com/aws/aws-sdk-go/aws/client"
 	awsrequest "github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
-	"golang.org/x/xerrors"
 )
 
 type ObjectSelector interface {
@@ -64,7 +65,7 @@ func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata,
 		r.Handlers.Send.RemoveByName(awsclient.LogHTTPResponseHeaderHandler.Name)
 	})
 	if err != nil {
-		return xerrors.Errorf("failed to execute s3api: %w", err)
+		return errors.Errorf("failed to execute s3api: %w", err)
 	}
 	defer resp.EventStream.Close()
 
@@ -100,7 +101,7 @@ func newInputSerialization(cfg *config.InputSerialization) (*s3sdk.InputSerializ
 			},
 		}, nil
 	default:
-		return nil, xerrors.New("choose a input format type from: [json, csv]")
+		return nil, errors.Errorf("choose a input format type from: [json, csv]: %w", cli.ValidateConfigError)
 	}
 }
 
@@ -123,6 +124,6 @@ func newOutputSerialization(cfg *config.OutputSerialization) (*s3sdk.OutputSeria
 			},
 		}, nil
 	default:
-		return nil, xerrors.New("choose a output format type from: [json, csv]")
+		return nil, errors.Errorf("choose a output format type from: [json, csv]: %w", cli.ValidateConfigError)
 	}
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
@@ -15,10 +16,7 @@ const (
 
 	// Errors start at 10
 	ExitCodeError = 10 + iota
-	ExitCodeParseFlagsError
-	ExitCodeLoggerError
-	ExitCodeCloudError
-	ExitCodeObjectListingError
+	ExitCodeInitializeError
 )
 
 func main() {
@@ -36,14 +34,20 @@ func run(args []string) int {
 	logger, err := log.New(logLevel)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to generate logger: %s", err.Error())
+		return ExitCodeInitializeError
 	}
 	cliFactory, err := cli.NewFactory(buildVersion, logger)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to initialize process: %s", err.Error())
+		return ExitCodeInitializeError
 	}
 	rootCmd := root.NewCmdRoot(cliFactory, buildVersion, buildDate)
 
 	if _, err := rootCmd.ExecuteC(); err != nil {
+		switch {
+		case errors.Is(err, cli.ValidateConfigError):
+			// advice for configuration
+		}
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
 
