@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"fmt"
 	"io"
 
 	"github.com/44smkn/s3select/pkg/aws"
@@ -12,7 +13,6 @@ import (
 	awsrequest "github.com/aws/aws-sdk-go/aws/request"
 	"github.com/aws/aws-sdk-go/service/s3"
 	s3sdk "github.com/aws/aws-sdk-go/service/s3"
-	"github.com/pkg/errors"
 	"go.uber.org/zap"
 )
 
@@ -65,7 +65,7 @@ func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata,
 		r.Handlers.Send.RemoveByName(awsclient.LogHTTPResponseHeaderHandler.Name)
 	})
 	if err != nil {
-		return errors.Errorf("failed to execute s3api: %w", err)
+		return fmt.Errorf("failed to execute s3api: %w", err)
 	}
 	defer resp.EventStream.Close()
 
@@ -101,7 +101,7 @@ func newInputSerialization(cfg *config.InputSerialization) (*s3sdk.InputSerializ
 			},
 		}, nil
 	default:
-		return nil, errors.Errorf("choose a input format type from: [json, csv]: %w", cli.ValidateConfigError)
+		return nil, fmt.Errorf("choose a input format type from: [json, csv]: %w", cli.ValidateConfigError)
 	}
 }
 
@@ -124,6 +124,6 @@ func newOutputSerialization(cfg *config.OutputSerialization) (*s3sdk.OutputSeria
 			},
 		}, nil
 	default:
-		return nil, errors.Errorf("choose a output format type from: [json, csv]: %w", cli.ValidateConfigError)
+		return nil, fmt.Errorf("choose a output format type from: [json, csv]: %w", cli.ValidateConfigError)
 	}
 }
