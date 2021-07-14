@@ -6,6 +6,7 @@ import (
 
 	"github.com/44smkn/s3select/pkg/cli"
 	"github.com/44smkn/s3select/pkg/config"
+	"github.com/AlecAivazis/survey/v2"
 	awssdk "github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/manifoldco/promptui"
@@ -72,7 +73,7 @@ func configureRun(opts *ConfigureOptions) error {
 		return err
 	}
 
-	region, err := regionPrompt()
+	region, err := regionPrompt(cfg.GetAWSRegion())
 	if err != nil {
 		return err
 	}
@@ -101,19 +102,21 @@ func configureRun(opts *ConfigureOptions) error {
 	return cfg.Write(config.ConfigFile())
 }
 
-func regionPrompt() (string, error) {
-	rp := promptui.Prompt{
-		Label: "Region",
-		Validate: func(input string) error {
-			for _, r := range awsRegions {
-				if input == r {
-					return nil
-				}
-			}
-			return xerrors.New("your specified region does not exists")
-		},
+func regionPrompt(defaultRegion string) (string, error) {
+	region := defaultRegion
+	prompt := &survey.Input{
+		Message: "Region",
 	}
-	return rp.Run()
+	validator := func(input interface{}) error {
+		for _, r := range awsRegions {
+			if input == r {
+				return nil
+			}
+		}
+		return xerrors.New("your specified region does not exists")
+	}
+	err := cli.SurvayAskOne(prompt, &region, survey.WithValidator(validator))
+	return region, err
 }
 
 func inputSerializationPrompt(cfg *config.InputSerialization, detail bool) (*config.InputSerialization, error) {
