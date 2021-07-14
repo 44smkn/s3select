@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
-	github.com/aws/aws-sdk-go v1.38.68
+	github.com/aws/aws-sdk-go v1.39.6
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.6
 	github.com/manifoldco/promptui v0.8.0
