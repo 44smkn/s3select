@@ -8,7 +8,6 @@ require (
 	github.com/aws/aws-sdk-go v1.39.6
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.6
-	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-colorable v0.1.8
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/cobra v1.2.1
