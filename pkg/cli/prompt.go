@@ -2,7 +2,7 @@ package cli
 
 import "github.com/AlecAivazis/survey/v2"
 
-var SurvayAskOne = func(p survey.Prompt, response interface{}, opts ...survey.AskOpt) error {
+var SurveyAskOne = func(p survey.Prompt, response interface{}, opts ...survey.AskOpt) error {
 	return survey.AskOne(p, response, opts...)
 }
 
@@ -12,6 +12,6 @@ func Select(msg string, options []string, defaultVal string) string {
 		Options: options,
 	}
 	var val string
-	_ = SurvayAskOne(prompt, &val)
+	_ = SurveyAskOne(prompt, &val)
 	return val
 }
