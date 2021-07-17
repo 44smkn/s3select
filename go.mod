@@ -5,7 +5,7 @@ go 1.16
 require (
 	github.com/AlecAivazis/survey/v2 v2.2.14
 	github.com/MakeNowJust/heredoc v1.0.0
-	github.com/aws/aws-sdk-go v1.40.1
+	github.com/aws/aws-sdk-go v1.40.2
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.5.6
 	github.com/mattn/go-colorable v0.1.8
