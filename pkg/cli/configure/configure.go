@@ -56,7 +56,7 @@ func NewCmdCongigure(f *cli.Factory) *cobra.Command {
 		Use:   "configure",
 		Short: "Confugure s3select settings",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			return configureRun(&opts)
+			return ConfigureRun(&opts)
 		},
 	}
 
@@ -65,13 +65,13 @@ func NewCmdCongigure(f *cli.Factory) *cobra.Command {
 	return cmd
 }
 
-func configureRun(opts *ConfigureOptions) error {
+func ConfigureRun(opts *ConfigureOptions) error {
 	cfg, err := opts.Config()
 	if err != nil {
 		return err
 	}
 
-	region := regionPrompt(cfg.GetAWSRegion())
+	region := RegionPrompt(cfg.GetAWSRegion())
 	cfg.SetAWSRegion(region)
 
 	profiles, err := cfg.Profiles()
@@ -97,7 +97,7 @@ func configureRun(opts *ConfigureOptions) error {
 	return cfg.Write(config.ConfigFile())
 }
 
-func regionPrompt(current string) string {
+func RegionPrompt(current string) string {
 	msg := fmt.Sprintf("Select the region your s3bucket exists [%s]", current)
 	return cli.Select(msg, awsRegions, current)
 }
