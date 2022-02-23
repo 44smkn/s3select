@@ -1,0 +1,27 @@
+{
+  extends: ["config:base"],
+  reviewers: ["44smkn"],
+  labels: ["renovate:{{depName}}"],
+  packageRules: [
+    {
+      matchManagers: ["gomod"],
+      matchUpdateTypes: ["minor", "patch", "pin"],
+      automerge: true,
+      postUpdateOptions: ["gomodTidy"],
+    },
+    {
+      matchUpdateTypes: ["minor", "patch", "pin"],
+      automerge: true,
+    },
+  ],
+  regexManagers: [
+    // GitHub Actions
+    {
+      fileMatch: ["^\\.github/.*\\.ya?ml$"],
+      matchStrings: [
+        "go-version: (?<currentValue>.*?) # renovate: depName=(?<depName>.*)",
+      ],
+      datasourceTemplate: "golang-version",
+    },
+  ],
+}

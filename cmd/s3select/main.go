@@ -15,8 +15,7 @@ const (
 	ExitCodeOK int = 0
 
 	// Errors start at 10
-	ExitCodeError = 10 + iota
-	ExitCodeInitializeError
+	ExitCodeInitializeError = 10 + iota
 )
 
 func main() {

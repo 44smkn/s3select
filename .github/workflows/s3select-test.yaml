@@ -1,0 +1,57 @@
+name: s3select / test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/s3select-test.yaml
+      - cmd/s3select/**
+      - pkg/**
+      - script/**
+      - go.mod
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/s3select-test.yaml
+      - cmd/s3select/**
+      - pkg/**
+      - script/**
+      - go.mod
+
+jobs:
+  generate-mocks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go 1.17
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6 # renovate: depName=golang
+      - uses: actions/checkout@v2
+        # update the pull request branch
+        with:
+          ref: ${{ github.head_ref }}
+          token:  ${{ secrets.GHA_TOKEN }}
+      - run: go mod download
+      - name: Generate Mock Code
+        run: |
+          go install github.com/golang/mock/mockgen@v1.6.0
+          go generate ./...
+      - uses: int128/update-generated-files-action@v2
+
+  test:
+    needs: generate-mocks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.17.6 # renovate: depName=golang
+      - uses: actions/checkout@v2
+      - run: go mod download
+      - run: go test -race ./...
+      - run: go build -v ./cmd/s3select
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: golangci/golangci-lint-action@v2
