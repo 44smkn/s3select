@@ -28,8 +28,9 @@ jobs:
           go-version: 1.17.6 # renovate: depName=golang
       - uses: actions/checkout@v2
         # update the pull request branch
-        ref: ${{ github.head_ref }}
-        token:  ${{ secrets.GHA_TOKEN }}
+        with:
+          ref: ${{ github.head_ref }}
+          token:  ${{ secrets.GHA_TOKEN }}
       - run: go mod download
       - name: Generate Mock Code
         run: |
