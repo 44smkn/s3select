@@ -105,19 +105,26 @@ func ParseDefaultConfig() (Config, error) {
 
 func parseConfig(filename string) (Config, error) {
 	if !fileExists(filename) {
-		initConfigFile(filename)
+		err := initConfigFile(filename)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return parseConfigFile(filename)
 }
 
-func initConfigFile(filename string) {
+func initConfigFile(filename string) error {
 	cfg := &FileConfig{
 		AWSRegion: "us-west-2",
 		Proflies: map[string]Profile{
 			"default": NewDefaultProfile(),
 		},
 	}
-	cfg.Write(filename)
+	err := cfg.Write(filename)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func NewDefaultProfile() Profile {

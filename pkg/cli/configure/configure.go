@@ -148,7 +148,7 @@ var seprateCharacterMap = map[string]string{
 func csvFieldDelimiterPrompt(current string) string {
 	msg := fmt.Sprintf("Select Input CSV Field Delimiter [%s]", getKeyByValue(seprateCharacterMap, current))
 	key := cli.Select(msg, KeySet(seprateCharacterMap), current)
-	val, _ := seprateCharacterMap[key]
+	val := seprateCharacterMap[key]
 	return val
 }
 

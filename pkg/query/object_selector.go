@@ -73,7 +73,10 @@ func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata,
 		// If the event type is `records`, it fetch the data from the message.
 		v, ok := event.(*s3.RecordsEvent)
 		if ok {
-			writer.Write(v.Payload)
+			_, err := writer.Write(v.Payload)
+			if err != nil {
+				fmt.Errorf("failed to write records: %w", err)
+			}
 		}
 	}
 	return nil
