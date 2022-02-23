@@ -75,7 +75,7 @@ func (s defaultObjectSelector) Select(ctx context.Context, meta *ObjectMetadata,
 		if ok {
 			_, err := writer.Write(v.Payload)
 			if err != nil {
-				fmt.Errorf("failed to write records: %w", err)
+				return fmt.Errorf("failed to write records: %w", err)
 			}
 		}
 	}
