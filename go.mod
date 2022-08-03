@@ -1,6 +1,6 @@
 module github.com/44smkn/s3select
 
-go 1.16
+go 1.19
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.5
