@@ -3,7 +3,7 @@ module github.com/44smkn/s3select
 go 1.19
 
 require (
-	github.com/AlecAivazis/survey/v2 v2.3.5
+	github.com/AlecAivazis/survey/v2 v2.3.6
 	github.com/MakeNowJust/heredoc v1.0.0
 	github.com/aws/aws-sdk-go v1.44.92
 	github.com/golang/mock v1.6.0
