@@ -10,14 +10,14 @@ require (
 	github.com/google/go-cmp v0.5.9
 	github.com/mattn/go-colorable v0.1.13
 	github.com/pkg/errors v0.9.1
-	github.com/spf13/cobra v1.5.0
+	github.com/spf13/cobra v1.6.1
 	go.uber.org/zap v1.23.0
 	golang.org/x/xerrors v0.0.0-20220411194840-2f41105eb62f
 	gopkg.in/yaml.v2 v2.4.0
 )
 
 require (
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
