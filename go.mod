@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
 	github.com/MakeNowJust/heredoc v1.0.0
-	github.com/aws/aws-sdk-go v1.46.4
+	github.com/aws/aws-sdk-go v1.46.5
 	github.com/golang/mock v1.6.0
 	github.com/google/go-cmp v0.6.0
 	github.com/mattn/go-colorable v0.1.13
