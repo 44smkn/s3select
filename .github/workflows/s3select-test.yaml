@@ -25,7 +25,7 @@ jobs:
       - name: Set up Go 1.17
         uses: actions/setup-go@v4
         with:
-          go-version: 1.21.5 # renovate: depName=golang
+          go-version: 1.21.6 # renovate: depName=golang
       - uses: actions/checkout@v3
         # update the pull request branch
         with:
@@ -44,7 +44,7 @@ jobs:
     steps:
       - uses: actions/setup-go@v4
         with:
-          go-version: 1.21.5 # renovate: depName=golang
+          go-version: 1.21.6 # renovate: depName=golang
       - uses: actions/checkout@v3
       - run: go mod download
       - run: go test -race ./...
