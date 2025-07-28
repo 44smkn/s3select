@@ -11,7 +11,7 @@ jobs:
     # TODO: add changelog step between checkout and ron goreleaser
     steps:
       - name: Set up Go 1.16
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: 1.16
 
