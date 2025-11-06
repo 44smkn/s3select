@@ -2,7 +2,7 @@ module github.com/44smkn/s3select
 
 go 1.21
 
-toolchain go1.24.5
+toolchain go1.25.4
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
